@@ -419,3 +419,222 @@
   -fx-text-fill: #64748b;
   -fx-letter-spacing: 0.8px;
 }
+
+/* Paciente Recurrente */
+.rp-root {
+  -fx-background-color: transparent;
+}
+
+.rp-content {
+  -fx-background-color: transparent;
+}
+
+.rp-scroll-pane {
+  -fx-background-color: transparent;
+  -fx-background: transparent;
+  -fx-padding: 0;
+}
+.rp-scroll-pane .viewport {
+  -fx-background-color: transparent;
+}
+
+.rp-search-row {
+  -fx-background-color: transparent;
+}
+
+.rp-search-field {
+  -fx-pref-width: 720;
+  -fx-background-radius: 16;
+  -fx-border-radius: 16;
+  -fx-border-color: #e6e9ef;
+  -fx-background-color: white;
+  -fx-padding: 10 12;
+  -fx-font-size: 12px;
+}
+.rp-search-field:focused {
+  -fx-border-color: rgba(11, 114, 133, 0.75);
+}
+
+.rp-button-fill-primary {
+  -fx-background-color: #0b7285;
+  -fx-text-fill: white;
+  -fx-padding: 10 16;
+  -fx-background-radius: 14;
+  -fx-font-weight: 800;
+}
+.rp-button-fill-primary:hover {
+  -fx-background-color: #085c6b;
+}
+
+.rp-found-text-state-primary {
+  -fx-font-size: 12px;
+  -fx-font-weight: 800;
+  -fx-text-fill: #0f172a;
+}
+
+.rp-chip-identity {
+  -fx-padding: 6 10;
+  -fx-background-radius: 999;
+  -fx-font-size: 10px;
+  -fx-font-weight: 900;
+  -fx-letter-spacing: 0.8px;
+}
+.rp-chip-identity-tone-ok {
+  -fx-background-color: rgba(21, 128, 61, 0.14);
+  -fx-text-fill: #15803d;
+}
+.rp-chip-identity-tone-warn {
+  -fx-background-color: rgba(180, 83, 9, 0.16);
+  -fx-text-fill: #b45309;
+}
+
+.rp-patient-card {
+  -fx-background-color: white;
+  -fx-background-radius: 16;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 16;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.05), 12, 0.18, 0, 6);
+}
+.rp-patient-card:hover {
+  -fx-border-color: rgba(11, 114, 133, 0.35);
+}
+.rp-patient-card-state-selected {
+  -fx-border-color: rgba(11, 114, 133, 0.95);
+}
+
+.rp-avatar-shape {
+  -fx-background-color: #e2e8f0;
+  -fx-background-radius: 14;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 14;
+}
+
+.rp-card-title-text-state-primary {
+  -fx-font-size: 14px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0f172a;
+}
+
+.rp-card-meta-text-state-primary {
+  -fx-font-size: 10px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0b7285;
+  -fx-text-alignment: RIGHT;
+}
+
+.rp-chip-card {
+  -fx-background-color: #f1f5f9;
+  -fx-background-radius: 14;
+  -fx-border-color: #e6e9ef;
+  -fx-border-radius: 14;
+}
+
+.rp-chip-label-text-state-muted {
+  -fx-font-size: 9px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #64748b;
+  -fx-letter-spacing: 0.8px;
+}
+.rp-chip-value-text-state-primary {
+  -fx-font-size: 11px;
+  -fx-font-weight: 800;
+  -fx-text-fill: #0f172a;
+}
+
+.rp-subtitle-text-state-accent {
+  -fx-font-size: 10px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0b7285;
+  -fx-letter-spacing: 0.9px;
+}
+
+.rp-list-text-state-primary {
+  -fx-font-size: 11px;
+  -fx-text-fill: #334155;
+}
+
+.rp-side-card {
+  -fx-background-color: white;
+  -fx-background-radius: 16;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 16;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.05), 12, 0.18, 0, 6);
+}
+
+.rp-step-row {
+  -fx-background-color: #f8fafc;
+  -fx-background-radius: 12;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 12;
+  -fx-padding: 8 10;
+}
+
+.rp-radio {
+  -fx-font-weight: 800;
+  -fx-text-fill: #0f172a;
+}
+
+.rp-note-text-state-primary {
+  -fx-font-size: 11px;
+  -fx-text-fill: #334155;
+}
+
+.rp-button-tone-link {
+  -fx-background-color: transparent;
+  -fx-padding: 8 6;
+  -fx-text-fill: #0b7285;
+  -fx-font-weight: 900;
+}
+.rp-button-tone-link:hover {
+  -fx-underline: true;
+}
+
+.rp-mini-row {
+  -fx-background-color: transparent;
+}
+.rp-mini-card {
+  -fx-background-color: #f1f5f9;
+  -fx-background-radius: 16;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 16;
+}
+
+.rp-fab-button {
+  -fx-background-color: #0b7285;
+  -fx-text-fill: white;
+  -fx-font-weight: 900;
+  -fx-background-radius: 999;
+  -fx-min-width: 44;
+  -fx-min-height: 44;
+  -fx-max-width: 44;
+  -fx-max-height: 44;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.22), 18, 0.2, 0, 8);
+}
+.rp-fab-button:hover {
+  -fx-background-color: #085c6b;
+}
+
+.rp-action-button-tone-neutral {
+  -fx-background-color: #f8fafc;
+  -fx-border-color: #e6e9ef;
+  -fx-border-radius: 12;
+  -fx-background-radius: 12;
+  -fx-padding: 10 12;
+  -fx-text-fill: #0f172a;
+  -fx-font-weight: 800;
+  -fx-alignment: CENTER;
+}
+.rp-action-button-tone-neutral:hover {
+  -fx-background-color: #f0f4ff;
+}
+
+.rp-action-patient-text-state-primary {
+  -fx-font-size: 12px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0f172a;
+}
+
+.rp-action-status-text-state-muted {
+  -fx-font-size: 11px;
+  -fx-text-fill: #64748b;
+}

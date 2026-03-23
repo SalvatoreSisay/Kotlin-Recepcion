@@ -69,7 +69,7 @@ class PanelPrincipalController {
         when ((boton.userData as? String)?.trim().orEmpty()) {
             "dashboard" -> showDashboard()
             "nuevo-paciente" -> showNuevoPaciente()
-            "paciente-recurrente" -> showPlaceholder("Paciente Recurrente", "Sección en desarrollo.")
+            "paciente-recurrente" -> showPacienteRecurrente()
             "busqueda-pacientes" -> showPlaceholder("Búsqueda de Pacientes", "Sección en desarrollo.")
             "agendar" -> showPlaceholder("Agendar", "Sección en desarrollo.")
             "reportes" -> showPlaceholder("Reportes", "Sección en desarrollo.")
@@ -87,6 +87,7 @@ class PanelPrincipalController {
     }
 
     private var nuevoPacienteRoot: Parent? = null
+    private var pacienteRecurrenteRoot: Parent? = null
 
     private fun showDashboard() {
         navViewHost.children.clear()
@@ -106,6 +107,20 @@ class PanelPrincipalController {
         dashboardView.isVisible = false
         dashboardView.isManaged = false
         navViewHost.children.setAll(nuevoPacienteRoot)
+        navViewHost.isVisible = true
+        navViewHost.isManaged = true
+    }
+
+    private fun showPacienteRecurrente() {
+        if (pacienteRecurrenteRoot == null) {
+            val url = PanelPrincipalController::class.java.getResource("/com/resdev/akrecepcion/recepcionui/paciente-recurrente-view.fxml")
+            val loader = FXMLLoader(url)
+            pacienteRecurrenteRoot = loader.load()
+        }
+
+        dashboardView.isVisible = false
+        dashboardView.isManaged = false
+        navViewHost.children.setAll(pacienteRecurrenteRoot)
         navViewHost.isVisible = true
         navViewHost.isManaged = true
     }

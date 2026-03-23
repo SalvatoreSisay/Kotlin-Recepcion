@@ -22,13 +22,11 @@
            styleClass="login-root">
 
     <!-- Background -->
-    <ImageView fitWidth="1400.0" fitHeight="900.0" preserveRatio="true" smooth="true" styleClass="bg-image">
-        <image>
-            <Image url="@loginidea1.png"/>
-        </image>
+    <ImageView fitWidth="1400.0" fitHeight="900.0" preserveRatio="true" styleClass="bg-image">
         <effect>
             <GaussianBlur radius="22.0"/>
         </effect>
+        <Image url="@loginidea1.png"/>
     </ImageView>
     <Region styleClass="bg-scrim"/>
 
@@ -42,11 +40,11 @@
                 <StackPane styleClass="brand-mark">
                     <Label text="+" styleClass="brand-plus"/>
                 </StackPane>
-                <Label text="Serenidad Clínica" styleClass="brand-name"/>
+                <Label text="Hospitalito Atitlan" styleClass="brand-name"/>
             </HBox>
         </left>
         <right>
-            <Label text="MEDSHIELD SEGURO" styleClass="brand-secure"/>
+            <Label text="Asociación K'aslímaal" styleClass="brand-secure"/>
         </right>
     </BorderPane>
 
@@ -120,7 +118,7 @@
                 <Label text="TÉRMINOS DEL SERVICIO" styleClass="bottom-link"/>
                 <Label text="CONTACTAR SOPORTE" styleClass="bottom-link"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label text="© 2026 SERENIDAD CLÍNICA" styleClass="bottom-muted"/>
+                <Label text="© 2026 ISD Informatica y Servicion de Desarrollo" styleClass="bottom-muted"/>
             </HBox>
         </bottom>
     </BorderPane>
@@ -129,7 +127,7 @@
     <StackPane fx:id="popupOverlay" styleClass="popup-overlay">
         <VBox fx:id="popupCard" spacing="12.0" styleClass="popup-card">
             <padding>
-                <Insets top="16.0" right="16.0" bottom="14.0" left="16.0"/>
+                <Insets top="36.0" right="16.0" bottom="34.0" left="16.0"/>
             </padding>
             <Label text="Error" styleClass="popup-title"/>
             <Label fx:id="lblPopupMensaje" wrapText="true" styleClass="popup-message"/>
