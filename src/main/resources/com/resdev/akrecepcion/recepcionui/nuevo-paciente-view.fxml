@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import java.lang.String?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.resdev.akrecepcion.recepcionui.NuevoPacienteController"
+      spacing="18.0"
+      styleClass="wizard-root">
+
+    <padding>
+        <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+    </padding>
+
+    <VBox spacing="6.0">
+        <Label text="Registro de nuevo paciente" styleClass="wizard-title-text-state-primary"/>
+        <Label text="Completa el perfil inicial para iniciar el expediente. Los campos con asterisco (*) son obligatorios."
+               wrapText="true"
+               styleClass="muted"/>
+    </VBox>
+
+    <VBox spacing="10.0" styleClass="wizard-steps-container">
+        <HBox spacing="14.0" alignment="CENTER_LEFT" styleClass="wizard-steps-row">
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Region fx:id="step1Circle">
+                    <styleClass>
+                        <String fx:value="wizard-step-circle"/>
+                        <String fx:value="wizard-step-circle-state-active"/>
+                    </styleClass>
+                </Region>
+                <Label fx:id="step1Label" text="1. INFORMACION PERSONAL">
+                    <styleClass>
+                        <String fx:value="wizard-step-text"/>
+                        <String fx:value="wizard-step-text-state-active"/>
+                    </styleClass>
+                </Label>
+            </HBox>
+            <Region fx:id="stepLine12" HBox.hgrow="ALWAYS">
+                <styleClass>
+                    <String fx:value="wizard-step-line"/>
+                    <String fx:value="wizard-step-line-state-idle"/>
+                </styleClass>
+            </Region>
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Region fx:id="step2Circle">
+                    <styleClass>
+                        <String fx:value="wizard-step-circle"/>
+                        <String fx:value="wizard-step-circle-state-idle"/>
+                    </styleClass>
+                </Region>
+                <Label fx:id="step2Label" text="2. UBICACION">
+                    <styleClass>
+                        <String fx:value="wizard-step-text"/>
+                        <String fx:value="wizard-step-text-state-idle"/>
+                    </styleClass>
+                </Label>
+            </HBox>
+            <Region fx:id="stepLine23" HBox.hgrow="ALWAYS">
+                <styleClass>
+                    <String fx:value="wizard-step-line"/>
+                    <String fx:value="wizard-step-line-state-idle"/>
+                </styleClass>
+            </Region>
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Region fx:id="step3Circle">
+                    <styleClass>
+                        <String fx:value="wizard-step-circle"/>
+                        <String fx:value="wizard-step-circle-state-idle"/>
+                    </styleClass>
+                </Region>
+                <Label fx:id="step3Label" text="3. AREA MEDICA">
+                    <styleClass>
+                        <String fx:value="wizard-step-text"/>
+                        <String fx:value="wizard-step-text-state-idle"/>
+                    </styleClass>
+                </Label>
+            </HBox>
+        </HBox>
+        <Separator />
+    </VBox>
+
+    <VBox spacing="14.0" styleClass="wizard-card">
+        <padding>
+            <Insets top="18.0" right="18.0" bottom="16.0" left="18.0"/>
+        </padding>
+
+        <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <StackPane styleClass="wizard-card-icon">
+                <Label text="+" styleClass="wizard-card-icon-text"/>
+            </StackPane>
+            <VBox spacing="2.0">
+                <Label text="Datos del paciente" styleClass="card-title"/>
+                <Label text="Captura informacion basica para el expediente." styleClass="muted"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblWizardStatus" text="" styleClass="wizard-status"/>
+        </HBox>
+
+        <StackPane fx:id="pagesHost" styleClass="wizard-pages-host">
+            <VBox fx:id="pagePersonal" spacing="12.0">
+                <Label text="Identidad del paciente" styleClass="section-title"/>
+
+                <GridPane hgap="12.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                    </columnConstraints>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="NOMBRE *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtNombre" promptText="ej. Alexander" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="APELLIDOS *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtApellidos" promptText="ej. Thompson" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="EDAD *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtEdad" promptText="ej. 28" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="GENERO *" styleClass="wizard-field-label"/>
+                        <ComboBox fx:id="cmbGenero" promptText="Selecciona genero" styleClass="wizard-field"/>
+                    </VBox>
+                </GridPane>
+            </VBox>
+
+            <VBox fx:id="pageUbicacion" spacing="12.0" visible="false" managed="false">
+                <Label text="Ubicacion y direccion" styleClass="section-title"/>
+
+                <GridPane hgap="12.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                    </columnConstraints>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="DIRECCION *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtDireccion" promptText="Calle, numero, colonia" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="CIUDAD / MUNICIPIO *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtCiudad" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="DEPARTAMENTO / ESTADO *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtDepartamento" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="PAIS *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtPais" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="CODIGO POSTAL" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtCodigoPostal" promptText="ej. 01001" styleClass="wizard-field"/>
+                    </VBox>
+                </GridPane>
+            </VBox>
+
+            <VBox fx:id="pageAreaMedica" spacing="12.0" visible="false" managed="false">
+                <Label text="Area medica" styleClass="section-title"/>
+
+                <GridPane hgap="12.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                    </columnConstraints>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="ESPECIALIDAD *" styleClass="wizard-field-label"/>
+                        <ComboBox fx:id="cmbEspecialidad" promptText="Selecciona un area" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="PRIORIDAD" styleClass="wizard-field-label"/>
+                        <ComboBox fx:id="cmbPrioridad" promptText="Selecciona prioridad" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2">
+                        <Label text="MOTIVO DE CONSULTA *" styleClass="wizard-field-label"/>
+                        <TextArea fx:id="txtMotivo" promptText="Describe brevemente el motivo" prefRowCount="4">
+                            <styleClass>
+                                <String fx:value="wizard-field"/>
+                                <String fx:value="wizard-textarea"/>
+                            </styleClass>
+                        </TextArea>
+                    </VBox>
+                </GridPane>
+            </VBox>
+        </StackPane>
+
+        <HBox spacing="12.0" alignment="CENTER_LEFT">
+            <Button fx:id="btnGuardarBorrador" text="Guardar borrador" styleClass="wizard-button-tone-link"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnAnterior" text="Anterior" styleClass="wizard-button-tone-secondary"/>
+            <Button fx:id="btnSiguiente" text="Siguiente paso  →" styleClass="wizard-button-fill-primary"/>
+        </HBox>
+    </VBox>
+
+    <HBox spacing="14.0">
+        <VBox spacing="6.0" HBox.hgrow="ALWAYS" styleClass="wizard-info-card">
+            <padding>
+                <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+            </padding>
+            <Label text="Ingreso cifrado de datos" styleClass="card-title"/>
+            <Label text="La informacion capturada se protege y se usa solo para fines clinicos y administrativos."
+                   wrapText="true"
+                   styleClass="muted"/>
+        </VBox>
+
+        <VBox spacing="4.0" prefWidth="250.0" styleClass="wizard-info-card">
+            <padding>
+                <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+            </padding>
+            <Label text="100%" styleClass="wizard-integrity-value"/>
+            <Label text="INTEGRIDAD DE DATOS" styleClass="wizard-integrity-label"/>
+            <Label text="Validacion basica activa" styleClass="muted"/>
+        </VBox>
+    </HBox>
+
+</VBox>

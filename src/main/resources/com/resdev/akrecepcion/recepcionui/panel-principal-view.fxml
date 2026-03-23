@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import java.lang.String?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.resdev.akrecepcion.recepcionui.PanelPrincipalController"
+            stylesheets="@recepcion.css"
+            styleClass="app-root">
+
+    <left>
+        <VBox spacing="14.0" styleClass="sidebar">
+            <padding>
+                <Insets top="18.0" right="14.0" bottom="18.0" left="14.0"/>
+            </padding>
+
+            <VBox spacing="4.0">
+                <Label text="Centro Médico" styleClass="brand-title"/>
+                <Label text="Portal de recepción" styleClass="brand-subtitle"/>
+            </VBox>
+
+            <Separator />
+
+            <VBox fx:id="navContainer" spacing="6.0">
+                <Button text="Menu Principal" userData="dashboard" onAction="#onNavClick" styleClass="nav-button"/>
+                <Button text="Nuevo Paciente" userData="nuevo-paciente" onAction="#onNavClick" styleClass="nav-button"/>
+                <Button text="Paciente Recurrente" userData="paciente-recurrente" onAction="#onNavClick" styleClass="nav-button"/>
+                <Button text="Búsqueda de Pacientes" userData="busqueda-pacientes" onAction="#onNavClick" styleClass="nav-button"/>
+                <Button text="Agendar" userData="agendar" onAction="#onNavClick" styleClass="nav-button"/>
+                <Button text="Reportes" userData="reportes" onAction="#onNavClick" styleClass="nav-button"/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button text="Ingreso de emergencia" styleClass="danger-button"/>
+
+            <Separator />
+
+            <VBox spacing="6.0">
+                <Button text="Configuración" userData="configuracion" onAction="#onNavClick" styleClass="nav-button-tone-secondary"/>
+                <Button text="Ayuda" userData="ayuda" onAction="#onNavClick" styleClass="nav-button-tone-secondary"/>
+            </VBox>
+        </VBox>
+    </left>
+
+    <top>
+        <HBox spacing="10.0" styleClass="topbar">
+            <padding>
+                <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
+            </padding>
+
+            <Label text="Serenidad Clínica" styleClass="app-title"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <TextField promptText="Buscar paciente" styleClass="search-field"/>
+            <Button text="Notificaciones" styleClass="ghost-button"/>
+            <Button text="Perfil" styleClass="ghost-button"/>
+            <Button text="Cerrar sesión" onAction="#onCerrarSesion">
+                <styleClass>
+                    <String fx:value="ghost-button-tone-logout" />
+                </styleClass>
+            </Button>
+        </HBox>
+    </top>
+
+    <center>
+        <StackPane fx:id="centerHost" styleClass="content-host">
+            <VBox fx:id="dashboardView" spacing="18.0" styleClass="content">
+                <padding>
+                    <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+                </padding>
+
+                <VBox spacing="6.0">
+                    <Label fx:id="lblSaludo" text="Bienvenido de nuevo" styleClass="h1"/>
+                    <Label fx:id="lblResumen" text="Resumen" styleClass="muted"/>
+                </VBox>
+
+                <HBox spacing="14.0">
+                    <VBox spacing="8.0" styleClass="card">
+                        <Label text="Nuevo paciente" styleClass="card-title"/>
+                        <Label text="Inicia un registro para un nuevo ingreso. Captura datos y crea el expediente."
+                               wrapText="true" styleClass="muted"/>
+                        <Button text="Iniciar registro" styleClass="link-button"/>
+                    </VBox>
+                    <VBox spacing="8.0" styleClass="card">
+                        <Label text="Paciente recurrente" styleClass="card-title"/>
+                        <Label text="Búsqueda rápida para pacientes existentes y actualización del motivo de visita."
+                               wrapText="true" styleClass="muted"/>
+                        <Button text="Recuperar perfil" styleClass="link-button"/>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="14.0">
+                    <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Actividad de hoy" styleClass="section-title"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Ver todos los registros" styleClass="ghost-link"/>
+                        </HBox>
+
+                        <HBox spacing="10.0">
+                            <VBox spacing="3.0" styleClass="stat">
+                                <Label text="24" styleClass="stat-value"/>
+                                <Label text="COMPLETADOS" styleClass="stat-label"/>
+                            </VBox>
+                            <VBox spacing="3.0" styleClass="stat">
+                                <Label text="8" styleClass="stat-value"/>
+                                <Label text="EN PROGRESO" styleClass="stat-label"/>
+                            </VBox>
+                            <VBox spacing="3.0" styleClass="stat">
+                                <Label text="12" styleClass="stat-value"/>
+                                <Label text="PROGRAMADOS" styleClass="stat-label"/>
+                            </VBox>
+                        </HBox>
+
+                        <TableView fx:id="tablaActividad" styleClass="table">
+                            <columns>
+                                <TableColumn fx:id="colNombre" text="Nombre del paciente" prefWidth="230.0"/>
+                                <TableColumn fx:id="colTipo" text="Tipo" prefWidth="130.0"/>
+                                <TableColumn fx:id="colEstado" text="Estado" prefWidth="130.0"/>
+                                <TableColumn fx:id="colHora" text="Hora" prefWidth="90.0"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <VBox spacing="14.0" prefWidth="290.0">
+                        <VBox spacing="10.0" styleClass="card">
+                            <Label text="Herramientas rápidas" styleClass="card-title"/>
+                            <Button text="Validar seguro" styleClass="tool-button"/>
+                            <Button text="Agenda diaria" styleClass="tool-button"/>
+                            <Button text="Lote de brazaletes" styleClass="tool-button"/>
+                        </VBox>
+
+                        <VBox spacing="10.0">
+                            <styleClass>
+                                <String fx:value="card"/>
+                                <String fx:value="teal-card"/>
+                            </styleClass>
+                            <Label text="Salud del sistema">
+                                <styleClass>
+                                <String fx:value="card-title"/>
+                                <String fx:value="inverted"/>
+                                </styleClass>
+                            </Label>
+                            <Label text="Red óptima">
+                                <styleClass>
+                                    <String fx:value="h2"/>
+                                    <String fx:value="inverted"/>
+                                </styleClass>
+                            </Label>
+                            <Label text="Sincronización segura activa">
+                                <styleClass>
+                                    <String fx:value="muted"/>
+                                    <String fx:value="inverted"/>
+                                </styleClass>
+                            </Label>
+                        </VBox>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <StackPane fx:id="navViewHost" visible="false" managed="false"/>
+        </StackPane>
+    </center>
+
+</BorderPane>
