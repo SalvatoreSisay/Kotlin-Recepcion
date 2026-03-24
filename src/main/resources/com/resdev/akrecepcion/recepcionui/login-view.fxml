@@ -26,7 +26,7 @@
         <effect>
             <GaussianBlur radius="22.0"/>
         </effect>
-        <Image url="@loginidea1.png"/>
+        <Image url="@FondoLogin.png"/>
     </ImageView>
     <Region styleClass="bg-scrim"/>
 

@@ -1,4 +1,5 @@
 .login-root {
+  -fx-alignment: CENTER;
   -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   -fx-background-color: #0b3a43;
 }
@@ -6,7 +7,6 @@
 .bg-image {
   -fx-opacity: 0.95;
 }
-
 .bg-scrim {
   -fx-background-color: linear-gradient(to bottom, rgba(10, 66, 77, 0.72), rgba(10, 66, 77, 0.55));
 }
@@ -14,7 +14,6 @@
 .brand-row {
   -fx-alignment: CENTER_LEFT;
 }
-
 .brand-mark {
   -fx-min-width: 20;
   -fx-min-height: 20;
@@ -25,31 +24,34 @@
   -fx-border-color: rgba(255, 255, 255, 0.18);
   -fx-border-radius: 6;
 }
-
 .brand-plus {
   -fx-text-fill: rgba(255, 255, 255, 0.9);
   -fx-font-weight: 900;
   -fx-font-size: 12px;
 }
-
 .brand-name {
   -fx-text-fill: rgba(255, 255, 255, 0.92);
   -fx-font-weight: 800;
   -fx-font-size: 14px;
 }
-
 .brand-secure {
   -fx-text-fill: rgba(255, 255, 255, 0.65);
   -fx-font-weight: 800;
   -fx-font-size: 10px;
 }
 
+
+/* ---------- Card principal ---------- */
+
 .login-card {
-  -fx-background-color: rgba(245, 248, 252, 0.96);
-  -fx-background-radius: 14;
+  -fx-background-color: rgba(255, 255, 255, 0.92);
+  -fx-background-radius: 24;
+  -fx-padding: 34 30 32 30;
+  -fx-pref-width: 360;
+  -fx-max-width: 360;
   -fx-border-color: rgba(255, 255, 255, 0.18);
   -fx-border-radius: 14;
-  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.25), 26, 0.22, 0, 18);
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 40, 0, 0, 20);
 }
 
 .card-icon {
@@ -61,6 +63,7 @@
   -fx-background-radius: 12;
   -fx-border-color: #d7e9ee;
   -fx-border-radius: 12;
+  -fx-alignment: CENTER;
 }
 
 .card-icon-text {
@@ -80,11 +83,27 @@
   -fx-font-size: 12px;
 }
 
+/* ---------- Campos ---------- */
+
 .field-label {
   -fx-text-fill: #64748b;
   -fx-font-size: 10px;
   -fx-font-weight: 900;
-  -fx-letter-spacing: 0.6px;
+}
+
+.field-wrap {
+  -fx-background-color: rgba(15, 23, 42, 0.06);
+  -fx-border-color: rgba(15, 23, 42, 0.07);
+  -fx-background-radius: 12;
+  -fx-border-radius: 12;
+  -fx-padding: 4 12 4 12;
+  -fx-alignment: CENTER_LEFT;
+}
+
+.field-wrap-focused {
+  -fx-border-color: rgba(11, 114, 133, 0.55);
+  -fx-background-color: rgba(255, 255, 255, 0.82);
+  -fx-effect: dropshadow(gaussian, rgba(11, 114, 133, 0.10), 12, 0.12, 0, 2);
 }
 
 .field {
@@ -94,24 +113,22 @@
   -fx-border-radius: 10;
   -fx-padding: 10 0 10 0;
   -fx-prompt-text-fill: rgba(100, 116, 139, 0.75);
-}
-.field:focused {
-  -fx-border-color: transparent;
-  -fx-background-color: transparent;
+  -fx-text-fill: #0f172a;
 }
 
-.field-wrap {
-  -fx-background-color: rgba(15, 23, 42, 0.06);
-  -fx-border-color: rgba(15, 23, 42, 0.07);
+.password-visible {
+  -fx-background-color: rgba(11, 114, 133, 0.03);
+  -fx-text-fill: #0f172a;
+}
+
+.field-password-visible {
+  -fx-text-fill: #0f172a;
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
   -fx-background-radius: 10;
   -fx-border-radius: 10;
-  -fx-padding: 0 10 0 10;
-  -fx-alignment: CENTER_LEFT;
-}
-
-.field-wrap-focused {
-  -fx-border-color: rgba(11, 114, 133, 0.55);
-  -fx-background-color: rgba(255, 255, 255, 0.82);
+  -fx-padding: 10 0 10 0;
+  -fx-prompt-text-fill: rgba(100, 116, 139, 0.75);
 }
 
 .field-icon {
@@ -133,14 +150,18 @@
 
 .field-eye {
   -fx-background-color: transparent;
-  -fx-text-fill: rgba(15, 23, 42, 0.55);
+  -fx-text-fill: rgba(15, 23, 42, 0.58);
   -fx-font-weight: 800;
   -fx-padding: 6 8;
   -fx-background-radius: 10;
 }
+
 .field-eye:hover {
   -fx-background-color: rgba(15, 23, 42, 0.06);
+  -fx-text-fill: rgba(15, 23, 42, 0.80);
 }
+
+/* ---------- Controles secundarios ---------- */
 
 .checkbox {
   -fx-text-fill: #334155;
@@ -153,6 +174,7 @@
   -fx-padding: 6 8;
   -fx-font-weight: 800;
 }
+
 .link:hover {
   -fx-underline: true;
 }
@@ -162,9 +184,11 @@
   -fx-text-fill: white;
   -fx-font-weight: 900;
   -fx-background-radius: 12;
-  -fx-padding: 12 14;
-  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.18), 16, 0.18, 0, 10);
+  -fx-padding: 14 16;
+  -fx-font-size: 13px;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.22), 18, 0.2, 0, 10);
 }
+
 .primary:hover {
   -fx-background-color: #0a6474;
 }
@@ -185,6 +209,60 @@
   -fx-font-size: 11px;
 }
 
+/* ---------- Popup pequeño y elegante ---------- */
+
+.popup-overlay {
+  -fx-background-color: rgba(2, 6, 23, 0.38);
+  -fx-padding: 12;
+  -fx-alignment: CENTER;
+}
+
+.popup-card {
+  -fx-pref-width: 260;
+  -fx-max-width: 260;
+  -fx-min-width: 260;
+
+  -fx-pref-height: 360;
+  -fx-max-height: 360;
+
+  -fx-background-color: rgba(248, 250, 252, 0.98);
+  -fx-background-radius: 16;
+  -fx-border-color: rgba(148, 163, 184, 0.18);
+  -fx-border-radius: 16;
+
+  -fx-padding: 12 14 12 14;
+  -fx-spacing: 8;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.18), 18, 0.14, 0, 8);
+}
+
+.popup-title {
+  -fx-text-fill: #0f172a;
+  -fx-font-weight: 900;
+  -fx-font-size: 13px;
+}
+
+.popup-message {
+  -fx-text-fill: #475569;
+  -fx-font-size: 11px;
+  -fx-wrap-text: true;
+  -fx-text-alignment: center;
+}
+
+.popup-ok {
+  -fx-background-color: #0b7285;
+  -fx-text-fill: white;
+  -fx-font-weight: 900;
+  -fx-background-radius: 10;
+  -fx-padding: 7 14;
+  -fx-font-size: 11px;
+}
+
+.popup-ok:hover {
+  -fx-background-color: #0a6474;
+}
+
+/* ---------- Extras ---------- */
+
 .bottom-link {
   -fx-text-fill: rgba(255, 255, 255, 0.65);
   -fx-font-weight: 800;
@@ -194,40 +272,4 @@
 .bottom-muted {
   -fx-text-fill: rgba(255, 255, 255, 0.55);
   -fx-font-size: 9px;
-}
-
-.popup-overlay {
-  -fx-background-color: rgba(2, 6, 23, 0.35);
-  -fx-padding: 18;
-}
-
-.popup-card {
-  -fx-max-width: 420;
-  -fx-background-color: rgba(248, 250, 252, 0.98);
-  -fx-background-radius: 14;
-  -fx-border-color: rgba(148, 163, 184, 0.28);
-  -fx-border-radius: 14;
-  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.30), 28, 0.22, 0, 18);
-}
-
-.popup-title {
-  -fx-text-fill: #0f172a;
-  -fx-font-weight: 900;
-  -fx-font-size: 14px;
-}
-
-.popup-message {
-  -fx-text-fill: #334155;
-  -fx-font-size: 12px;
-}
-
-.popup-ok {
-  -fx-background-color: #0b7285;
-  -fx-text-fill: white;
-  -fx-font-weight: 900;
-  -fx-background-radius: 10;
-  -fx-padding: 8 12;
-}
-.popup-ok:hover {
-  -fx-background-color: #0a6474;
 }

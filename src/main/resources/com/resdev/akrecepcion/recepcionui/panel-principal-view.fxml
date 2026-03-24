@@ -139,9 +139,9 @@
                     <VBox spacing="14.0" prefWidth="290.0">
                         <VBox spacing="10.0" styleClass="card">
                             <Label text="Herramientas rápidas" styleClass="card-title"/>
-                            <Button text="Validar seguro" styleClass="tool-button"/>
+                            <Button text="Agenda semanal" styleClass="tool-button"/>
                             <Button text="Agenda diaria" styleClass="tool-button"/>
-                            <Button text="Lote de brazaletes" styleClass="tool-button"/>
+                            <Button text="Ultimo paciente" styleClass="tool-button"/>
                         </VBox>
 
                         <VBox spacing="10.0">
