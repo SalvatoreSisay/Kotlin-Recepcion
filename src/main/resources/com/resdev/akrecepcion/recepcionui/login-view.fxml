@@ -1,139 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.GaussianBlur?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Priority?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 
-<StackPane xmlns:fx="http://javafx.com/fxml"
-           fx:controller="com.resdev.akrecepcion.recepcionui.LoginController"
-           stylesheets="@login.css"
-           styleClass="login-root">
+<StackPane styleClass="login-root" stylesheets="@login.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.resdev.akrecepcion.recepcionui.LoginController">
 
     <!-- Background -->
-    <ImageView fitWidth="1400.0" fitHeight="900.0" preserveRatio="true" styleClass="bg-image">
+    <ImageView fitHeight="900.0" fitWidth="1400.0" preserveRatio="true" styleClass="bg-image">
         <effect>
-            <GaussianBlur radius="22.0"/>
+            <GaussianBlur radius="22.0" />
         </effect>
-        <Image url="@FondoLogin.png"/>
+        <Image url="@loginidea1.png" />
     </ImageView>
-    <Region styleClass="bg-scrim"/>
+    <Region styleClass="bg-scrim" />
 
     <!-- Top brand -->
-    <BorderPane pickOnBounds="false" maxWidth="1600.0">
+    <BorderPane maxWidth="1600.0" pickOnBounds="false">
         <padding>
-            <Insets top="18.0" right="22.0" bottom="18.0" left="22.0"/>
+            <Insets bottom="18.0" left="22.0" right="22.0" top="18.0" />
         </padding>
         <left>
             <HBox spacing="10.0" styleClass="brand-row">
                 <StackPane styleClass="brand-mark">
-                    <Label text="+" styleClass="brand-plus"/>
+                    <Label styleClass="brand-plus" text="✙" />
                 </StackPane>
-                <Label text="Hospitalito Atitlan" styleClass="brand-name"/>
+                <Label styleClass="brand-name" text="Hospitalito Atitlan" />
             </HBox>
         </left>
         <right>
-            <Label text="Asociación K'aslímaal" styleClass="brand-secure"/>
+            <Label styleClass="brand-secure" text="Asociación K'aslímaal" />
         </right>
     </BorderPane>
 
     <!-- Card -->
-    <VBox spacing="14.0" maxWidth="420.0" styleClass="login-card">
+    <!-- Evita que StackPane amplíe verticalmente la tarjeta; mantén su tamaño ajustado al contenido. -->
+    <VBox maxHeight="-2.0" maxWidth="420.0" spacing="14.0" styleClass="login-card">
         <padding>
-            <Insets top="26.0" right="26.0" bottom="20.0" left="26.0"/>
+            <Insets bottom="20.0" left="26.0" right="26.0" top="26.0" />
         </padding>
 
         <StackPane styleClass="card-icon">
-            <Label text="ID" styleClass="card-icon-text"/>
+            <Label alignment="CENTER" styleClass="card-icon-text" text="ID" />
         </StackPane>
 
-        <VBox spacing="6.0" alignment="CENTER">
-            <Label text="Portal de Registro" styleClass="card-title"/>
-            <Label text="Ingresa tus credenciales para acceder al sistema." wrapText="true" styleClass="card-subtitle"/>
+        <VBox alignment="CENTER" spacing="6.0">
+            <Label styleClass="card-title" text="Portal de Registro" />
+            <Label styleClass="card-subtitle" text="Ingresa tus credenciales." wrapText="true" />
         </VBox>
 
         <VBox spacing="8.0">
-            <Label text="ID DE EMPLEADO / USUARIO" styleClass="field-label"/>
+            <Label styleClass="field-label" text="ID DE EMPLEADO / USUARIO" />
             <HBox fx:id="usuarioWrap" spacing="10.0" styleClass="field-wrap">
                 <StackPane styleClass="field-icon">
-                    <Label text="ID" styleClass="field-icon-text"/>
+                    <Label styleClass="field-icon-text" text="ID" />
                 </StackPane>
-                <TextField fx:id="txtUsuario" promptText="ej. CS-98421" styleClass="field"/>
+                <TextField fx:id="txtUsuario" promptText="ej. CS-98421" styleClass="field" />
             </HBox>
         </VBox>
 
         <VBox spacing="8.0">
-            <Label text="CONTRASEÑA" styleClass="field-label"/>
+            <Label styleClass="field-label" text="CONTRASEÑA" />
             <HBox fx:id="contrasenaWrap" spacing="10.0" styleClass="field-wrap">
                 <StackPane styleClass="field-icon">
-                    <Label text="*" styleClass="field-icon-text"/>
+                    <Label styleClass="field-icon-text" text="*" />
                 </StackPane>
                 <StackPane HBox.hgrow="ALWAYS">
-                    <PasswordField fx:id="txtContrasena" promptText="••••••••" styleClass="field"/>
-                    <TextField fx:id="txtContrasenaVisible" promptText="••••••••" styleClass="field"/>
+                    <PasswordField fx:id="txtContrasena" promptText="••••••••" styleClass="field" />
+                    <TextField fx:id="txtContrasenaVisible" promptText="••••••••" styleClass="field" />
                 </StackPane>
-                <Button text="Ver" onAction="#onTogglePassword" styleClass="field-eye"/>
+                <Button onAction="#onTogglePassword" styleClass="field-eye" text="Ver" />
             </HBox>
         </VBox>
 
-        <HBox spacing="10.0" alignment="CENTER_LEFT">
-            <CheckBox text="Recordarme" styleClass="checkbox"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="¿Olvidaste tu contraseña?" styleClass="link"/>
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <CheckBox styleClass="checkbox" text="Recordarme" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button styleClass="link" text="¿Olvidaste tu contraseña?" />
         </HBox>
 
-        <Button text="Ingresar al portal  →" onAction="#onLoginClick" styleClass="primary"/>
+        <Button onAction="#onLoginClick" styleClass="primary" text="Ingresar al portal  →" />
 
         <StackPane>
-            <Label text="AUTENTICACIÓN MULTIFACTOR ACTIVA" styleClass="pill"/>
+            <Label styleClass="pill" text="AUTENTICACIÓN MULTIFACTOR ACTIVA" />
         </StackPane>
 
-        <Region VBox.vgrow="ALWAYS"/>
+        <!-- Este espaciador(Region) hacía que la tarjeta ocupara toda la altura disponible. Mantén el nodo, pero evita que afecte al diseño. -->
+        <Region managed="false" visible="false" />
 
-        <HBox spacing="6.0" alignment="CENTER">
-            <Label text="¿No tienes una cuenta?" styleClass="foot-muted"/>
-            <Button text="Crear cuenta" styleClass="link"/>
+        <HBox alignment="CENTER" spacing="6.0">
+            <Label styleClass="foot-muted" text="¿No tienes una cuenta?" />
+            <Button styleClass="link" text="Crear cuenta" />
         </HBox>
     </VBox>
 
     <!-- Bottom links -->
-    <BorderPane pickOnBounds="false" maxWidth="1600.0">
+    <BorderPane maxWidth="1600.0" pickOnBounds="false" prefHeight="47.0" prefWidth="114.0">
         <padding>
-            <Insets top="18.0" right="22.0" bottom="18.0" left="22.0"/>
+            <Insets bottom="18.0" left="22.0" right="22.0" top="18.0" />
         </padding>
         <bottom>
-            <HBox spacing="14.0" alignment="CENTER_LEFT">
-                <Label text="POLÍTICA DE PRIVACIDAD" styleClass="bottom-link"/>
-                <Label text="TÉRMINOS DEL SERVICIO" styleClass="bottom-link"/>
-                <Label text="CONTACTAR SOPORTE" styleClass="bottom-link"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="© 2026 ISD Informatica y Servicion de Desarrollo" styleClass="bottom-muted"/>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <Label styleClass="bottom-link" text="POLÍTICA DE PRIVACIDAD" />
+                <Label styleClass="bottom-link" text="TÉRMINOS DEL SERVICIO" />
+                <Label styleClass="bottom-link" text="CONTACTAR SOPORTE" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label styleClass="bottom-muted" text="© 2026 ISD Informatica y Servicion de Desarrollo" />
             </HBox>
         </bottom>
     </BorderPane>
 
     <!-- Popup overlay -->
-    <StackPane fx:id="popupOverlay" styleClass="popup-overlay">
-        <VBox fx:id="popupCard" spacing="12.0" styleClass="popup-card">
-            <padding>
-                <Insets top="36.0" right="16.0" bottom="34.0" left="16.0"/>
-            </padding>
-            <Label text="Error" styleClass="popup-title"/>
-            <Label fx:id="lblPopupMensaje" wrapText="true" styleClass="popup-message"/>
-            <HBox spacing="10.0" alignment="CENTER_RIGHT">
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnPopupAceptar" text="Aceptar" onAction="#onPopupAceptar" styleClass="popup-ok"/>
+    <!-- Inicialmente, estará oculto y no ocupará espacio en la maquetación; muéstralo desde el controlador cuando sea necesario. -->
+    <StackPane fx:id="popupOverlay" managed="false" styleClass="popup-overlay" visible="false" StackPane.alignment="CENTER">
+        <VBox fx:id="popupCard" alignment="CENTER" maxHeight="360.0" maxWidth="260.0" prefWidth="260.0" spacing="8.0" styleClass="popup-card">
+            <Label styleClass="popup-title" text="Error" />
+            <Label fx:id="lblPopupMensaje" styleClass="popup-message" wrapText="true" />
+            <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnPopupAceptar" onAction="#onPopupAceptar" styleClass="popup-ok" text="Aceptar" />
             </HBox>
         </VBox>
     </StackPane>

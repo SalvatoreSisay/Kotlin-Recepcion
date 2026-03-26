@@ -11,7 +11,7 @@ import javafx.util.Duration
 class RecepcionApplication : Application() {
     private companion object {
         private const val RES_BASE = "/com/resdev/akrecepcion/recepcionui/"
-        private const val LOGIN_FXML = "${RES_BASE}login-view1.fxml"
+        private const val LOGIN_FXML = "${RES_BASE}login-view.fxml"
         private const val PANEL_FXML = "${RES_BASE}panel-principal-view.fxml"
     }
 
