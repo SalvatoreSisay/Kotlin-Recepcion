@@ -13,7 +13,7 @@
         <effect>
             <GaussianBlur radius="22.0" />
         </effect>
-        <Image url="@loginidea1.png" />
+        <Image url="@FondoLogin.png" />
     </ImageView>
     <Region styleClass="bg-scrim" />
 
@@ -81,7 +81,9 @@
             <Button styleClass="link" text="¿Olvidaste tu contraseña?" />
         </HBox>
 
-        <Button onAction="#onLoginClick" styleClass="primary" text="Ingresar al portal  →" />
+        <StackPane>
+            <Button onAction="#onLoginClick" styleClass="primary" text="Ingresar al portal  →" />
+        </StackPane>
 
         <StackPane>
             <Label styleClass="pill" text="AUTENTICACIÓN MULTIFACTOR ACTIVA" />
@@ -118,10 +120,9 @@
         <VBox fx:id="popupCard" alignment="CENTER" maxHeight="360.0" maxWidth="260.0" prefWidth="260.0" spacing="8.0" styleClass="popup-card">
             <Label styleClass="popup-title" text="Error" />
             <Label fx:id="lblPopupMensaje" styleClass="popup-message" wrapText="true" />
-            <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                <Region HBox.hgrow="ALWAYS" />
+            <StackPane>
                 <Button fx:id="btnPopupAceptar" onAction="#onPopupAceptar" styleClass="popup-ok" text="Aceptar" />
-            </HBox>
+            </StackPane>
         </VBox>
     </StackPane>
 
