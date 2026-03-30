@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.String?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.resdev.akrecepcion.recepcionui.AgendarCitaController"
+           styleClass="ap-root">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="ap-scroll-pane">
+        <VBox spacing="18.0" styleClass="ap-content">
+            <padding>
+                <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+            </padding>
+
+            <VBox spacing="6.0">
+                <Label text="Agendar cita" styleClass="wizard-title-text-state-primary"/>
+                <Label text="Selecciona un paciente, asigna un especialista y define fecha, hora y procedimiento."
+                       wrapText="true"
+                       styleClass="muted"/>
+            </VBox>
+
+            <VBox spacing="10.0" styleClass="wizard-steps-container">
+                <HBox spacing="14.0" alignment="CENTER_LEFT" styleClass="wizard-steps-row">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Region fx:id="step1Circle">
+                            <styleClass>
+                                <String fx:value="wizard-step-circle"/>
+                                <String fx:value="wizard-step-circle-state-active"/>
+                            </styleClass>
+                        </Region>
+                        <Label fx:id="step1Label" text="1. PACIENTE">
+                            <styleClass>
+                                <String fx:value="wizard-step-text"/>
+                                <String fx:value="wizard-step-text-state-active"/>
+                            </styleClass>
+                        </Label>
+                    </HBox>
+
+                    <Region fx:id="stepLine12" HBox.hgrow="ALWAYS">
+                        <styleClass>
+                            <String fx:value="wizard-step-line"/>
+                            <String fx:value="wizard-step-line-state-idle"/>
+                        </styleClass>
+                    </Region>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Region fx:id="step2Circle">
+                            <styleClass>
+                                <String fx:value="wizard-step-circle"/>
+                                <String fx:value="wizard-step-circle-state-idle"/>
+                            </styleClass>
+                        </Region>
+                        <Label fx:id="step2Label" text="2. ESPECIALISTA Y HORARIO">
+                            <styleClass>
+                                <String fx:value="wizard-step-text"/>
+                                <String fx:value="wizard-step-text-state-idle"/>
+                            </styleClass>
+                        </Label>
+                    </HBox>
+
+                    <Region fx:id="stepLine23" HBox.hgrow="ALWAYS">
+                        <styleClass>
+                            <String fx:value="wizard-step-line"/>
+                            <String fx:value="wizard-step-line-state-idle"/>
+                        </styleClass>
+                    </Region>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Region fx:id="step3Circle">
+                            <styleClass>
+                                <String fx:value="wizard-step-circle"/>
+                                <String fx:value="wizard-step-circle-state-idle"/>
+                            </styleClass>
+                        </Region>
+                        <Label fx:id="step3Label" text="3. RESUMEN">
+                            <styleClass>
+                                <String fx:value="wizard-step-text"/>
+                                <String fx:value="wizard-step-text-state-idle"/>
+                            </styleClass>
+                        </Label>
+                    </HBox>
+                </HBox>
+                <Separator />
+            </VBox>
+
+            <HBox spacing="14.0">
+                <VBox spacing="14.0" HBox.hgrow="ALWAYS" styleClass="ap-main-card">
+                    <padding>
+                        <Insets top="18.0" right="18.0" bottom="16.0" left="18.0"/>
+                    </padding>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <StackPane styleClass="ap-card-icon">
+                            <Label text="⏱" styleClass="ap-card-icon-text"/>
+                        </StackPane>
+                        <VBox spacing="2.0">
+                            <Label fx:id="lblCardTitle" text="Selecciona un paciente" styleClass="card-title"/>
+                            <Label fx:id="lblCardSubtitle" text="Busca y elige a quién deseas agendar la cita." styleClass="muted"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblWizardStatus" styleClass="wizard-status"/>
+                    </HBox>
+
+                    <StackPane fx:id="pagesHost" styleClass="ap-pages-host">
+                        <VBox fx:id="pagePaciente" spacing="12.0">
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <TextField fx:id="txtBuscarPaciente" promptText="Buscar paciente por nombre o ID..." styleClass="ap-search-field" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnLimpiarPaciente" text="Limpiar" styleClass="ap-ghost-button"/>
+                            </HBox>
+
+                            <VBox spacing="10.0" styleClass="ap-list-shell">
+                                <Label fx:id="lblPacienteCount" text="0 pacientes" styleClass="ap-meta"/>
+                                <VBox fx:id="patientsContainer" spacing="10.0"/>
+                            </VBox>
+                        </VBox>
+
+                        <VBox fx:id="pageHorario" spacing="14.0" visible="false" managed="false">
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <Label text="1. Selecciona un especialista" styleClass="ap-section-title"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnFiltroEspecialidad" text="Filtrar por especialidad" styleClass="ap-filter-chip"/>
+                            </HBox>
+
+                            <GridPane fx:id="doctorsGrid" hgap="12.0" vgap="12.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
+                                    <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
+                                </columnConstraints>
+                            </GridPane>
+
+                            <Separator />
+
+                            <Label text="2. Selecciona fecha y hora" styleClass="ap-section-title"/>
+
+                            <HBox spacing="14.0">
+                                <VBox spacing="10.0" prefWidth="320.0" styleClass="ap-subcard">
+                                    <padding>
+                                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                    </padding>
+                                    <Label text="Fecha" styleClass="ap-subtitle"/>
+                                    <DatePicker fx:id="datePicker" styleClass="wizard-field"/>
+                                    <Label text="Procedimiento" styleClass="ap-subtitle"/>
+                                    <ComboBox fx:id="cmbProcedimiento" promptText="Selecciona un procedimiento">
+                                        <styleClass>
+                                            <String fx:value="wizard-field"/>
+                                        </styleClass>
+                                    </ComboBox>
+                                    <Label text="Notas (opcional)" styleClass="ap-subtitle"/>
+                                    <TextArea fx:id="txtNotas" prefRowCount="3" promptText="Ej. traer resultados, ayuno, etc.">
+                                        <styleClass>
+                                            <String fx:value="wizard-field"/>
+                                            <String fx:value="wizard-textarea"/>
+                                        </styleClass>
+                                    </TextArea>
+                                </VBox>
+
+                                <VBox spacing="12.0" HBox.hgrow="ALWAYS" styleClass="ap-subcard">
+                                    <padding>
+                                        <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                    </padding>
+                                    <Label text="Horarios disponibles" styleClass="ap-subtitle"/>
+
+                                    <VBox spacing="10.0">
+                                        <VBox spacing="6.0">
+                                            <Label text="Sesiones de la mañana" styleClass="ap-slot-title"/>
+                                            <HBox fx:id="slotsManana" spacing="10.0"/>
+                                        </VBox>
+                                        <VBox spacing="6.0">
+                                            <Label text="Sesiones de la tarde" styleClass="ap-slot-title"/>
+                                            <HBox fx:id="slotsTarde" spacing="10.0"/>
+                                        </VBox>
+                                        <VBox spacing="6.0">
+                                            <Label text="Sesiones de la noche" styleClass="ap-slot-title"/>
+                                            <HBox fx:id="slotsNoche" spacing="10.0"/>
+                                        </VBox>
+                                    </VBox>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+
+                        <VBox fx:id="pageResumen" spacing="12.0" visible="false" managed="false">
+                            <Label text="Revisa la información antes de confirmar" styleClass="ap-section-title"/>
+
+                            <VBox spacing="10.0" styleClass="ap-summary-card">
+                                <padding>
+                                    <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+                                </padding>
+
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Paciente" styleClass="ap-summary-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblResumenPaciente" text="-" styleClass="ap-summary-value"/>
+                                </HBox>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Especialista" styleClass="ap-summary-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblResumenDoctor" text="-" styleClass="ap-summary-value"/>
+                                </HBox>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Fecha" styleClass="ap-summary-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblResumenFecha" text="-" styleClass="ap-summary-value"/>
+                                </HBox>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Hora" styleClass="ap-summary-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblResumenHora" text="-" styleClass="ap-summary-value"/>
+                                </HBox>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Procedimiento" styleClass="ap-summary-label"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblResumenProcedimiento" text="-" styleClass="ap-summary-value"/>
+                                </HBox>
+                                <Separator />
+                                <Label fx:id="lblResumenNotas" text="Sin notas." wrapText="true" styleClass="muted"/>
+                            </VBox>
+                        </VBox>
+                    </StackPane>
+
+                    <HBox spacing="12.0" alignment="CENTER_LEFT">
+                        <Button fx:id="btnGuardar" text="Guardar borrador" styleClass="wizard-button-tone-link"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnAnterior" text="Anterior" styleClass="wizard-button-tone-secondary"/>
+                        <Button fx:id="btnSiguiente" text="Siguiente paso  →" styleClass="wizard-button-fill-primary"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="12.0" prefWidth="320.0">
+                    <VBox spacing="10.0" styleClass="ap-side-card">
+                        <padding>
+                            <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+                        </padding>
+                        <Label text="Selección actual" styleClass="card-title"/>
+
+                        <VBox spacing="8.0">
+                            <VBox spacing="2.0" styleClass="ap-side-block">
+                                <Label text="PACIENTE" styleClass="ap-side-kicker"/>
+                                <Label fx:id="lblSelPaciente" text="-" styleClass="ap-side-strong"/>
+                                <Label fx:id="lblSelPacienteId" text="-" styleClass="muted"/>
+                            </VBox>
+
+                            <VBox spacing="2.0" styleClass="ap-side-block">
+                                <Label text="ESPECIALISTA" styleClass="ap-side-kicker"/>
+                                <Label fx:id="lblSelDoctor" text="-" styleClass="ap-side-strong"/>
+                                <Label fx:id="lblSelEspecialidad" text="-" styleClass="muted"/>
+                            </VBox>
+
+                            <VBox spacing="2.0" styleClass="ap-side-block">
+                                <Label text="AGENDA" styleClass="ap-side-kicker"/>
+                                <Label fx:id="lblSelFecha" text="-" styleClass="ap-side-strong"/>
+                                <Label fx:id="lblSelHora" text="-" styleClass="muted"/>
+                            </VBox>
+
+                            <VBox spacing="2.0" styleClass="ap-side-block">
+                                <Label text="PROCEDIMIENTO" styleClass="ap-side-kicker"/>
+                                <Label fx:id="lblSelProcedimiento" text="-" styleClass="ap-side-strong"/>
+                            </VBox>
+                        </VBox>
+
+                        <Separator />
+
+                        <Label fx:id="lblFee" text="Costo estimado  Q120.00" styleClass="ap-fee"/>
+                        <Button fx:id="btnConfirmar" text="Confirmar cita" styleClass="ap-confirm-button"/>
+                        <Label fx:id="lblConfirmStatus" wrapText="true" styleClass="ap-confirm-status"/>
+                    </VBox>
+
+                    <VBox spacing="8.0" styleClass="ap-tip-card">
+                        <padding>
+                            <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                        </padding>
+                        <Label text="Consejo" styleClass="ap-tip-title"/>
+                        <Label text="Los horarios marcados cambian según el especialista y la fecha seleccionada (demo)."
+                               wrapText="true"
+                               styleClass="muted"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>

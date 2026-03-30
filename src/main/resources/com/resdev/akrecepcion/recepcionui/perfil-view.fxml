@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<?import java.lang.String?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.resdev.akrecepcion.recepcionui.PerfilController"
+           styleClass="profile-root">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="profile-scroll-pane">
+        <VBox spacing="18.0" styleClass="profile-content">
+            <padding>
+                <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+            </padding>
+
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <VBox spacing="6.0">
+                    <Label text="Perfil de usuario" styleClass="wizard-title-text-state-primary"/>
+                    <Label text="Administra tu información, preferencias y credenciales de acceso."
+                           wrapText="true"
+                           styleClass="muted"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Volver al inicio" onAction="#onVolverInicio" styleClass="ghost-link"/>
+            </HBox>
+
+            <HBox spacing="14.0">
+                <VBox spacing="14.0" prefWidth="320.0">
+                    <VBox spacing="12.0" styleClass="card">
+                        <HBox spacing="12.0" alignment="CENTER_LEFT">
+                            <StackPane styleClass="profile-avatar">
+                                <Label fx:id="lblAvatarInitials" text="JC" styleClass="profile-avatar-text"/>
+                            </StackPane>
+                            <VBox spacing="3.0">
+                                <Label fx:id="lblNombreResumen" text="Juliane Castillo" styleClass="card-title"/>
+                                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                    <Label fx:id="lblRolResumen" text="Recepción" styleClass="muted"/>
+                                    <Label fx:id="lblEstadoResumen" text="ACTIVO" styleClass="profile-chip"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+
+                        <Separator />
+
+                        <VBox spacing="10.0">
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <Label text="Usuario" styleClass="wizard-field-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Copiar" onAction="#onCopiarUsuario" styleClass="ghost-link"/>
+                            </HBox>
+                            <TextField fx:id="txtUsuarioReadOnly"
+                                       editable="false"
+                                       focusTraversable="false"
+                                       styleClass="wizard-field"/>
+
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <Label text="Correo" styleClass="wizard-field-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Copiar" onAction="#onCopiarCorreo" styleClass="ghost-link"/>
+                            </HBox>
+                            <TextField fx:id="txtCorreoReadOnly"
+                                       editable="false"
+                                       focusTraversable="false"
+                                       styleClass="wizard-field"/>
+                        </VBox>
+                    </VBox>
+
+                    <VBox spacing="12.0">
+                        <styleClass>
+                            <String fx:value="card"/>
+                            <String fx:value="teal-card"/>
+                        </styleClass>
+                        <Label text="Accesos rápidos">
+                            <styleClass>
+                                <String fx:value="card-title"/>
+                                <String fx:value="inverted"/>
+                            </styleClass>
+                        </Label>
+                        <Label fx:id="lblUltimaActualizacion" text="Última actualización: hoy" wrapText="true">
+                            <styleClass>
+                                <String fx:value="muted"/>
+                                <String fx:value="inverted"/>
+                            </styleClass>
+                        </Label>
+                        <Label text="Tip: guarda tus cambios en el panel de la derecha." wrapText="true">
+                            <styleClass>
+                                <String fx:value="muted"/>
+                                <String fx:value="inverted"/>
+                            </styleClass>
+                        </Label>
+                    </VBox>
+                </VBox>
+
+                <VBox spacing="14.0" HBox.hgrow="ALWAYS">
+                    <VBox spacing="14.0" styleClass="wizard-card" HBox.hgrow="ALWAYS">
+                        <padding>
+                            <Insets top="18.0" right="18.0" bottom="16.0" left="18.0"/>
+                        </padding>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <StackPane styleClass="wizard-card-icon">
+                                <Label text="i" styleClass="wizard-card-icon-text"/>
+                            </StackPane>
+                            <VBox spacing="2.0">
+                                <Label text="Información del usuario" styleClass="card-title"/>
+                                <Label text="Campos básicos para tu cuenta y contacto." styleClass="muted"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblPerfilStatus" styleClass="wizard-status"/>
+                        </HBox>
+
+                        <Separator />
+
+                        <GridPane hgap="12.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+
+                            <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <Label text="NOMBRE COMPLETO *" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtNombreCompleto" promptText="ej. Juliane Castillo" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <Label text="DEPARTAMENTO" styleClass="wizard-field-label"/>
+                                <ComboBox fx:id="cmbDepartamento" promptText="Selecciona" styleClass="wizard-field"/>
+                            </VBox>
+
+                            <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <Label text="CORREO *" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtCorreo" promptText="ej. nombre@clinica.com" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <Label text="TELÉFONO" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtTelefono" promptText="ej. +502 5555 5555" styleClass="wizard-field"/>
+                            </VBox>
+
+                            <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <Label text="USUARIO" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtUsuario" editable="false" focusTraversable="false">
+                                    <styleClass>
+                                        <String fx:value="wizard-field"/>
+                                        <String fx:value="profile-field-readonly"/>
+                                    </styleClass>
+                                </TextField>
+                            </VBox>
+                            <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <Label text="ROL" styleClass="wizard-field-label"/>
+                                <ComboBox fx:id="cmbRol" promptText="Selecciona" styleClass="wizard-field"/>
+                            </VBox>
+                        </GridPane>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <CheckBox fx:id="chkNotificaciones" text="Recibir notificaciones" styleClass="checkbox"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="Restablecer" onAction="#onRestablecer" styleClass="wizard-button-tone-secondary"/>
+                            <Button text="Guardar cambios" onAction="#onGuardarPerfil" styleClass="wizard-button-fill-primary"/>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="14.0" styleClass="wizard-card" HBox.hgrow="ALWAYS">
+                        <padding>
+                            <Insets top="18.0" right="18.0" bottom="16.0" left="18.0"/>
+                        </padding>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <StackPane styleClass="wizard-card-icon">
+                                <Label text="*" styleClass="wizard-card-icon-text"/>
+                            </StackPane>
+                            <VBox spacing="2.0">
+                                <Label text="Seguridad" styleClass="card-title"/>
+                                <Label text="Actualiza tu contraseña local (demo) para esta sesión." styleClass="muted"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblPasswordStatus" styleClass="wizard-status"/>
+                        </HBox>
+
+                        <Separator />
+
+                        <GridPane hgap="12.0" vgap="10.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+
+                            <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <Label text="CONTRASEÑA ACTUAL *" styleClass="wizard-field-label"/>
+                                <PasswordField fx:id="txtPassActual" promptText="Ingresa la actual" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <Label text="NUEVA CONTRASEÑA *" styleClass="wizard-field-label"/>
+                                <PasswordField fx:id="txtPassNueva" promptText="Mínimo 4 caracteres" styleClass="wizard-field"/>
+                            </VBox>
+
+                            <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <Label text="CONFIRMAR NUEVA *" styleClass="wizard-field-label"/>
+                                <PasswordField fx:id="txtPassConfirmar" promptText="Repite la nueva" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <Label text=" " styleClass="wizard-field-label"/>
+                                <Button text="Actualizar contraseña"
+                                        onAction="#onActualizarPassword"
+                                        styleClass="wizard-button-fill-primary"
+                                        maxWidth="Infinity"
+                                        GridPane.hgrow="ALWAYS"/>
+                            </VBox>
+                        </GridPane>
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>

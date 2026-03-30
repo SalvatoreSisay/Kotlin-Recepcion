@@ -41,7 +41,8 @@ class PanelPrincipalController {
 
     @FXML
     private fun initialize() {
-        lblSaludo.text = "Bienvenido de nuevo, Juliane"
+        val nombre = AppSession.currentUser.nombreCompleto.trim().split(Regex("\\s+")).firstOrNull().orEmpty()
+        lblSaludo.text = if (nombre.isBlank()) "Bienvenido de nuevo" else "Bienvenido de nuevo, $nombre"
         lblResumen.text =
             "Tu espacio digital para la atención del paciente. Registra nuevos ingresos y agiliza el flujo de recepción."
 
@@ -70,8 +71,8 @@ class PanelPrincipalController {
             "dashboard" -> showDashboard()
             "nuevo-paciente" -> showNuevoPaciente()
             "paciente-recurrente" -> showPacienteRecurrente()
-            "busqueda-pacientes" -> showPlaceholder("Búsqueda de Pacientes", "Sección en desarrollo.")
-            "agendar" -> showPlaceholder("Agendar", "Sección en desarrollo.")
+            "busqueda-pacientes" -> showBusquedaPacientes()
+            "agendar" -> showAgendarCita()
             "reportes" -> showPlaceholder("Reportes", "Sección en desarrollo.")
             "configuracion" -> showPlaceholder("Configuración", "Sección en desarrollo.")
             "ayuda" -> showPlaceholder("Ayuda", "Sección en desarrollo.")
@@ -88,6 +89,10 @@ class PanelPrincipalController {
 
     private var nuevoPacienteRoot: Parent? = null
     private var pacienteRecurrenteRoot: Parent? = null
+    private var busquedaPacientesRoot: Parent? = null
+    private var agendarCitaRoot: Parent? = null
+    private var perfilRoot: Parent? = null
+    private var perfilController: PerfilController? = null
 
     private fun showDashboard() {
         navViewHost.children.clear()
@@ -125,6 +130,34 @@ class PanelPrincipalController {
         navViewHost.isManaged = true
     }
 
+    private fun showBusquedaPacientes() {
+        if (busquedaPacientesRoot == null) {
+            val url = PanelPrincipalController::class.java.getResource("/com/resdev/akrecepcion/recepcionui/busqueda-pacientes-view.fxml")
+            val loader = FXMLLoader(url)
+            busquedaPacientesRoot = loader.load()
+        }
+
+        dashboardView.isVisible = false
+        dashboardView.isManaged = false
+        navViewHost.children.setAll(busquedaPacientesRoot)
+        navViewHost.isVisible = true
+        navViewHost.isManaged = true
+    }
+
+    private fun showAgendarCita() {
+        if (agendarCitaRoot == null) {
+            val url = PanelPrincipalController::class.java.getResource("/com/resdev/akrecepcion/recepcionui/agendar-cita-view.fxml")
+            val loader = FXMLLoader(url)
+            agendarCitaRoot = loader.load()
+        }
+
+        dashboardView.isVisible = false
+        dashboardView.isManaged = false
+        navViewHost.children.setAll(agendarCitaRoot)
+        navViewHost.isVisible = true
+        navViewHost.isManaged = true
+    }
+
     private fun showPlaceholder(titulo: String, descripcion: String) {
         val box = VBox(6.0).apply {
             styleClass.add("content")
@@ -137,6 +170,33 @@ class PanelPrincipalController {
         dashboardView.isVisible = false
         dashboardView.isManaged = false
         navViewHost.children.setAll(box)
+        navViewHost.isVisible = true
+        navViewHost.isManaged = true
+    }
+
+    @FXML
+    private fun onPerfil(@Suppress("UNUSED_PARAMETER") event: ActionEvent) {
+        showPerfil()
+    }
+
+    private fun showPerfil() {
+        if (perfilRoot == null) {
+            val url = PanelPrincipalController::class.java.getResource("/com/resdev/akrecepcion/recepcionui/perfil-view.fxml")
+            val loader = FXMLLoader(url)
+            perfilRoot = loader.load()
+            perfilController =
+                loader.getController<PerfilController>().also {
+                    it.onBackToDashboard = {
+                        navContainer.children.filterIsInstance<Button>().firstOrNull()?.let { first -> setNavActivo(first) }
+                        showDashboard()
+                    }
+                }
+        }
+
+        perfilController?.refresh()
+        dashboardView.isVisible = false
+        dashboardView.isManaged = false
+        navViewHost.children.setAll(perfilRoot)
         navViewHost.isVisible = true
         navViewHost.isManaged = true
     }

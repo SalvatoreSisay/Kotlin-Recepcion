@@ -67,7 +67,7 @@
 
             <TextField promptText="Buscar paciente" styleClass="search-field"/>
             <Button text="Notificaciones" styleClass="ghost-button"/>
-            <Button text="Perfil" styleClass="ghost-button"/>
+            <Button text="Perfil" onAction="#onPerfil" styleClass="ghost-button"/>
             <Button text="Cerrar sesión" onAction="#onCerrarSesion">
                 <styleClass>
                     <String fx:value="ghost-button-tone-logout" />

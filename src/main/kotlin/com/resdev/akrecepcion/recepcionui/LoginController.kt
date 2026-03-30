@@ -69,6 +69,13 @@ class LoginController {
         val contrasena = txtContrasena.text.orEmpty()
 
         if (usuario == "admin" && contrasena == "1234") {
+            // Demo: precarga información de perfil para la sesión.
+            AppSession.currentUser =
+                AppSession.currentUser.copy(
+                    usuario = usuario,
+                    // Si el usuario cambió previamente el nombre en Perfil, lo mantenemos.
+                )
+            AppSession.updatePassword("1234")
             onLoginSuccess?.invoke()
             return
         }

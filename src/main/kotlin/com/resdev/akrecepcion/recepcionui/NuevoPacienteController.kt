@@ -22,12 +22,14 @@ class NuevoPacienteController {
         PERSONAL(0),
         UBICACION(1),
         AREA_MEDICA(2),
+        RESUMEN(3),
     }
 
     @FXML private lateinit var pagesHost: StackPane
     @FXML private lateinit var pagePersonal: VBox
     @FXML private lateinit var pageUbicacion: VBox
     @FXML private lateinit var pageAreaMedica: VBox
+    @FXML private lateinit var pageResumen: VBox
 
     @FXML private lateinit var step1Circle: Region
     @FXML private lateinit var step2Circle: Region
@@ -42,6 +44,7 @@ class NuevoPacienteController {
     @FXML private lateinit var btnSiguiente: Button
     @FXML private lateinit var btnGuardarBorrador: Button
     @FXML private lateinit var lblWizardStatus: Label
+    @FXML private lateinit var wizardNavRow: javafx.scene.layout.HBox
 
     // Paso 1
     @FXML private lateinit var txtNombre: TextField
@@ -60,6 +63,16 @@ class NuevoPacienteController {
     @FXML private lateinit var cmbEspecialidad: ComboBox<String>
     @FXML private lateinit var txtMotivo: TextArea
     @FXML private lateinit var cmbPrioridad: ComboBox<String>
+
+    // Resumen
+    @FXML private lateinit var lblResumenNombre: Label
+    @FXML private lateinit var lblResumenEdadGenero: Label
+    @FXML private lateinit var lblResumenDireccion: Label
+    @FXML private lateinit var lblResumenCiudadDepto: Label
+    @FXML private lateinit var lblResumenPaisPostal: Label
+    @FXML private lateinit var lblResumenEspecialidad: Label
+    @FXML private lateinit var lblResumenPrioridadChip: Label
+    @FXML private lateinit var lblResumenMotivo: Label
 
     private var pasoActual: Paso = Paso.PERSONAL
     private var animando = false
@@ -111,6 +124,7 @@ class NuevoPacienteController {
             Paso.PERSONAL -> Paso.PERSONAL
             Paso.UBICACION -> Paso.PERSONAL
             Paso.AREA_MEDICA -> Paso.UBICACION
+            Paso.RESUMEN -> Paso.AREA_MEDICA
         }
         if (next == pasoActual) return
         transicionar(next)
@@ -132,16 +146,10 @@ class NuevoPacienteController {
         val next = when (pasoActual) {
             Paso.PERSONAL -> Paso.UBICACION
             Paso.UBICACION -> Paso.AREA_MEDICA
-            Paso.AREA_MEDICA -> Paso.AREA_MEDICA
+            Paso.AREA_MEDICA -> Paso.RESUMEN
+            Paso.RESUMEN -> Paso.RESUMEN
         }
-        if (next == pasoActual) {
-            lblWizardStatus.text = "Registro listo para enviar (demo)."
-            lblWizardStatus.styleClass.remove("wizard-status-tone-error")
-            if (!lblWizardStatus.styleClass.contains("wizard-status-tone-ok")) {
-                lblWizardStatus.styleClass.add("wizard-status-tone-ok")
-            }
-            return
-        }
+        if (next == pasoActual) return
 
         transicionar(next)
     }
@@ -179,6 +187,7 @@ class NuevoPacienteController {
                 val okMotivo = req(txtMotivo)
                 okEspecialidad && okMotivo
             }
+            Paso.RESUMEN -> true
         }
     }
 
@@ -220,6 +229,9 @@ class NuevoPacienteController {
                 pasoActual = nextPaso
                 updateStepUI()
                 updateButtons()
+                if (pasoActual == Paso.RESUMEN) {
+                    renderResumen()
+                }
                 animando = false
             }
             play()
@@ -230,10 +242,11 @@ class NuevoPacienteController {
         Paso.PERSONAL -> pagePersonal
         Paso.UBICACION -> pageUbicacion
         Paso.AREA_MEDICA -> pageAreaMedica
+        Paso.RESUMEN -> pageResumen
     }
 
     private fun showOnly(node: VBox) {
-        listOf(pagePersonal, pageUbicacion, pageAreaMedica).forEach {
+        listOf(pagePersonal, pageUbicacion, pageAreaMedica, pageResumen).forEach {
             it.isVisible = it === node
             it.isManaged = it === node
             it.translateX = 0.0
@@ -242,7 +255,16 @@ class NuevoPacienteController {
 
     private fun updateButtons() {
         btnAnterior.isDisable = pasoActual == Paso.PERSONAL
-        btnSiguiente.text = if (pasoActual == Paso.AREA_MEDICA) "Finalizar" else "Siguiente paso  \u2192"
+        btnSiguiente.text =
+            when (pasoActual) {
+                Paso.AREA_MEDICA -> "Finalizar"
+                else -> "Siguiente paso  \u2192"
+            }
+
+        // En resumen, usamos el panel derecho de acciones (estructura de referencia).
+        val inResumen = pasoActual == Paso.RESUMEN
+        wizardNavRow.isVisible = !inResumen
+        wizardNavRow.isManaged = !inResumen
     }
 
     private fun updateStepUI() {
@@ -296,7 +318,96 @@ class NuevoPacienteController {
                 stepLine23.styleClass.add("wizard-step-line-state-done")
                 setActive(step3Circle, step3Label)
             }
+            Paso.RESUMEN -> {
+                setDone(step1Circle, step1Label)
+                setDone(step2Circle, step2Label)
+                stepLine12.styleClass.remove("wizard-step-line-state-idle")
+                stepLine12.styleClass.add("wizard-step-line-state-done")
+                stepLine23.styleClass.remove("wizard-step-line-state-idle")
+                stepLine23.styleClass.add("wizard-step-line-state-done")
+                // Mantenemos el último paso como "activo" para el cierre del flujo.
+                setActive(step3Circle, step3Label)
+            }
         }
     }
-}
 
+    private fun renderResumen() {
+        val nombre = "${txtNombre.text.orEmpty().trim()} ${txtApellidos.text.orEmpty().trim()}".trim().ifEmpty { "-" }
+        val edad = txtEdad.text.orEmpty().trim().ifEmpty { "-" }
+        val genero = (cmbGenero.value ?: "-").trim().ifEmpty { "-" }
+
+        val direccion = txtDireccion.text.orEmpty().trim().ifEmpty { "-" }
+        val ciudad = txtCiudad.text.orEmpty().trim().ifEmpty { "-" }
+        val depto = txtDepartamento.text.orEmpty().trim().ifEmpty { "-" }
+        val pais = txtPais.text.orEmpty().trim().ifEmpty { "-" }
+        val postal = txtCodigoPostal.text.orEmpty().trim().ifEmpty { "-" }
+
+        val esp = (cmbEspecialidad.value ?: "-").trim().ifEmpty { "-" }
+        val prioridad = (cmbPrioridad.value ?: "Normal").trim().ifEmpty { "Normal" }
+        val motivo = txtMotivo.text.orEmpty().trim().ifEmpty { "-" }
+
+        lblResumenNombre.text = nombre
+        lblResumenEdadGenero.text = "$edad años · $genero"
+        lblResumenDireccion.text = direccion
+        lblResumenCiudadDepto.text = "$ciudad · $depto"
+        lblResumenPaisPostal.text = "$pais · $postal"
+        lblResumenEspecialidad.text = esp
+        lblResumenPrioridadChip.text = prioridad.uppercase()
+        lblResumenMotivo.text = motivo
+
+        lblWizardStatus.text = ""
+    }
+
+    @FXML
+    private fun onEditarResumen(@Suppress("UNUSED_PARAMETER") event: javafx.event.ActionEvent) {
+        if (animando) return
+        transicionar(Paso.AREA_MEDICA)
+    }
+
+    @FXML
+    private fun onConfirmarRegistro(@Suppress("UNUSED_PARAMETER") event: javafx.event.ActionEvent) {
+        lblWizardStatus.text = "Registro confirmado. Expediente creado (demo)."
+        lblWizardStatus.styleClass.remove("wizard-status-tone-error")
+        if (!lblWizardStatus.styleClass.contains("wizard-status-tone-ok")) {
+            lblWizardStatus.styleClass.add("wizard-status-tone-ok")
+        }
+
+        limpiarFormulario()
+        showOnly(pagePersonal)
+        pasoActual = Paso.PERSONAL
+        updateStepUI()
+        updateButtons()
+    }
+
+    @FXML
+    private fun onDescartarRegistro(@Suppress("UNUSED_PARAMETER") event: javafx.event.ActionEvent) {
+        lblWizardStatus.text = "Registro descartado."
+        lblWizardStatus.styleClass.remove("wizard-status-tone-ok")
+        if (!lblWizardStatus.styleClass.contains("wizard-status-tone-error")) {
+            lblWizardStatus.styleClass.add("wizard-status-tone-error")
+        }
+
+        limpiarFormulario()
+        showOnly(pagePersonal)
+        pasoActual = Paso.PERSONAL
+        updateStepUI()
+        updateButtons()
+    }
+
+    private fun limpiarFormulario() {
+        txtNombre.clear()
+        txtApellidos.clear()
+        txtEdad.clear()
+        cmbGenero.selectionModel.clearSelection()
+
+        txtDireccion.clear()
+        txtCiudad.clear()
+        txtDepartamento.clear()
+        txtPais.clear()
+        txtCodigoPostal.clear()
+
+        cmbEspecialidad.selectionModel.clearSelection()
+        cmbPrioridad.selectionModel.selectFirst()
+        txtMotivo.clear()
+    }
+}
