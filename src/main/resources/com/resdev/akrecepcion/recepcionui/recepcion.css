@@ -749,6 +749,102 @@
   -fx-text-fill: #64748b;
 }
 
+/* Editar Paciente Recurrente */
+.rpe-root {
+  -fx-background-color: transparent;
+}
+
+.rpe-card-edit-button {
+  -fx-background-color: transparent;
+  -fx-border-color: #e6e9ef;
+  -fx-border-radius: 999;
+  -fx-background-radius: 999;
+  -fx-padding: 4 10;
+  -fx-font-size: 10px;
+  -fx-font-weight: 900;
+  -fx-letter-spacing: 0.7px;
+  -fx-text-fill: #0b7285;
+}
+.rpe-card-edit-button:hover {
+  -fx-background-color: rgba(11, 114, 133, 0.08);
+  -fx-border-color: rgba(11, 114, 133, 0.25);
+}
+
+.rpe-sub-card {
+  -fx-background-color: #f8fafc;
+  -fx-background-radius: 14;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 14;
+}
+
+.rpe-chip {
+  -fx-background-color: #f1f5f9;
+  -fx-border-color: #e6e9ef;
+  -fx-background-radius: 999;
+  -fx-border-radius: 999;
+}
+.rpe-chip-text {
+  -fx-font-size: 11px;
+  -fx-font-weight: 800;
+  -fx-text-fill: #0f172a;
+}
+.rpe-chip-remove {
+  -fx-background-color: transparent;
+  -fx-text-fill: #b42318;
+  -fx-font-weight: 900;
+  -fx-padding: 0 4;
+}
+.rpe-chip-remove:hover {
+  -fx-underline: true;
+}
+
+.rpe-table-row {
+  -fx-background-color: #f8fafc;
+  -fx-background-radius: 14;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 14;
+}
+.rpe-table-cell {
+  -fx-font-size: 11px;
+  -fx-text-fill: #334155;
+  -fx-font-weight: 700;
+}
+.rpe-danger-link {
+  -fx-background-color: transparent;
+  -fx-padding: 6 8;
+  -fx-text-fill: #b42318;
+  -fx-font-weight: 900;
+}
+.rpe-danger-link:hover {
+  -fx-underline: true;
+}
+
+.rpe-visit-card {
+  -fx-background-color: #f8fafc;
+  -fx-background-radius: 14;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 14;
+}
+.rpe-visit-date {
+  -fx-font-size: 10px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0b7285;
+  -fx-letter-spacing: 0.7px;
+}
+.rpe-visit-status {
+  -fx-padding: 4 10;
+  -fx-background-radius: 999;
+  -fx-font-size: 10px;
+  -fx-font-weight: 900;
+  -fx-letter-spacing: 0.8px;
+  -fx-background-color: rgba(11, 114, 133, 0.10);
+  -fx-text-fill: #0b7285;
+}
+
+.rpe-field-readonly {
+  -fx-background-color: rgba(148, 163, 184, 0.18);
+}
+
 /* Búsqueda de Pacientes (Search Directory) */
 .ps-root {
   -fx-background-color: transparent;
@@ -792,6 +888,133 @@
   -fx-padding: 6 8;
   -fx-font-size: 12px;
   -fx-text-fill: #0f172a;
+}
+
+/* Reportes */
+.re-root {
+  -fx-background-color: transparent;
+}
+.re-content {
+  -fx-background-color: transparent;
+}
+.re-scroll-pane {
+  -fx-background-color: transparent;
+  -fx-background: transparent;
+  -fx-padding: 0;
+}
+.re-scroll-pane .viewport {
+  -fx-background-color: transparent;
+}
+
+.re-period-group {
+  -fx-background-color: #eef2f7;
+  -fx-background-radius: 14;
+  -fx-border-color: #e6e9ef;
+  -fx-border-radius: 14;
+  -fx-padding: 2;
+}
+.re-period-button {
+  -fx-background-color: transparent;
+  -fx-text-fill: #334155;
+  -fx-font-weight: 900;
+  -fx-font-size: 11px;
+  -fx-padding: 8 12;
+  -fx-background-radius: 12;
+}
+.re-period-button:hover {
+  -fx-background-color: rgba(255, 255, 255, 0.65);
+}
+.re-period-button-active {
+  -fx-background-color: white;
+  -fx-text-fill: #0b7285;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.06), 8, 0.2, 0, 3);
+}
+
+.re-metric-strong {
+  -fx-font-size: 12px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0f172a;
+}
+.re-cell-strong {
+  -fx-font-size: 12px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0f172a;
+}
+.re-cell-muted {
+  -fx-font-size: 11px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #64748b;
+}
+
+.re-progress {
+  -fx-accent: #0b7285;
+  -fx-control-inner-background: rgba(148, 163, 184, 0.18);
+  -fx-background-radius: 999;
+  -fx-padding: 0;
+}
+.re-progress > .bar {
+  -fx-background-radius: 999;
+}
+.re-progress > .track {
+  -fx-background-radius: 999;
+}
+.re-progress-tone-amber {
+  -fx-accent: #f59e0b;
+}
+
+.re-diagnostico-name {
+  -fx-font-size: 12px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0f172a;
+}
+.re-diagnostico-row {
+  -fx-padding: 2 0;
+}
+
+.re-proc-row {
+  -fx-padding: 10 14;
+}
+
+.re-table-cols {
+  -fx-padding: 10 14;
+  -fx-background-color: #f8fafc;
+}
+
+.re-pie-chart {
+  -fx-background-color: transparent;
+}
+.re-pie-chart .chart-content {
+  -fx-padding: 10;
+}
+.re-pie-chart .chart-legend {
+  -fx-background-color: transparent;
+}
+.re-pie-chart .default-color0.chart-pie {
+  -fx-pie-color: #0b7285;
+}
+.re-pie-chart .default-color1.chart-pie {
+  -fx-pie-color: #f59e0b;
+}
+
+.re-bar-chart {
+  -fx-background-color: transparent;
+}
+.re-bar-chart .chart-plot-background {
+  -fx-background-color: transparent;
+}
+.re-bar-chart .chart-horizontal-grid-lines,
+.re-bar-chart .chart-vertical-grid-lines {
+  -fx-stroke: rgba(148, 163, 184, 0.35);
+}
+.re-bar-chart .axis {
+  -fx-tick-label-fill: #64748b;
+  -fx-font-size: 10px;
+}
+.re-bar-chart .axis-label {
+  -fx-text-fill: #64748b;
+}
+.re-bar-chart .default-color0.chart-bar {
+  -fx-bar-fill: #0b7285;
 }
 .ps-search-field:focused {
   -fx-background-color: transparent;
@@ -856,6 +1079,16 @@
 
 .ps-table-rows {
   -fx-background-color: transparent;
+}
+
+.pp-activity-table .ps-table-header {
+  -fx-padding: 10 14;
+}
+.pp-activity-table .ps-th {
+  -fx-padding: 0 8 0 0;
+}
+.pp-activity-table .ps-row {
+  -fx-padding: 10 14;
 }
 
 .ps-row {

@@ -18,14 +18,14 @@
            fx:controller="com.resdev.akrecepcion.recepcionui.PacienteRecurrenteController"
            styleClass="rp-root">
 
-    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="rp-scroll-pane">
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="rp-scroll-pane">
         <VBox spacing="18.0" styleClass="rp-content">
             <padding>
                 <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
             </padding>
 
             <VBox spacing="6.0">
-                <Label text="Interfaz de paciente recurrente" styleClass="wizard-title-text-state-primary"/>
+                <Label text="Paciente" styleClass="wizard-title-text-state-primary"/>
                 <Label text="Gestiona pacientes que regresan. Busca por ID, nombre o fecha de nacimiento para recuperar historial y agendar."
                        wrapText="true"
                        styleClass="muted"/>
@@ -41,7 +41,7 @@
             <HBox spacing="10.0" alignment="CENTER_LEFT">
                 <Label fx:id="lblEncontrados" text="Se encontraron 0 registros" styleClass="rp-found-text-state-primary"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Label fx:id="chipIdentidad" text="" styleClass="rp-chip-identity"/>
+                <Label fx:id="chipIdentidad" styleClass="rp-chip-identity"/>
             </HBox>
 
             <HBox spacing="14.0">
@@ -72,7 +72,7 @@
                         </HBox>
 
                         <Separator />
-                        <Label fx:id="lblAccionEstado" text="" wrapText="true" styleClass="rp-action-status-text-state-muted"/>
+                        <Label fx:id="lblAccionEstado" wrapText="true" styleClass="rp-action-status-text-state-muted"/>
                     </VBox>
 
                 <VBox spacing="10.0" styleClass="rp-side-card">
@@ -136,7 +136,7 @@
 
     <Button text="+" styleClass="rp-fab-button" StackPane.alignment="BOTTOM_RIGHT">
         <StackPane.margin>
-            <Insets top="0" right="18.0" bottom="18.0" left="0"/>
+            <Insets right="18.0" bottom="18.0"/>
         </StackPane.margin>
     </Button>
 </StackPane>

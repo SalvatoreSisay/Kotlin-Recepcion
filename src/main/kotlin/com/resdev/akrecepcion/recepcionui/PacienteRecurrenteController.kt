@@ -15,20 +15,7 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
 
 class PacienteRecurrenteController {
-    private data class PacienteModel(
-        val nombre: String,
-        val pacienteId: String,
-        val ultimaVisita: String,
-        val fechaNacimiento: String,
-        val tipoSangre: String,
-        val seguro: String,
-        val telefono: String,
-        val email: String,
-        val direccion: String,
-        val resumenClinico: List<String>,
-        val identidadVerificada: Boolean,
-        val notaRapida: String,
-    )
+    var onEditarPaciente: ((pacienteId: String) -> Unit)? = null
 
     @FXML private lateinit var txtBuscar: TextField
     @FXML private lateinit var btnBuscar: Button
@@ -52,65 +39,8 @@ class PacienteRecurrenteController {
     @FXML private lateinit var lblNotaRapida: Label
     @FXML private lateinit var btnAgregarNota: Button
 
-    private val pacientes = listOf(
-        PacienteModel(
-            nombre = "Ricardo Casares",
-            pacienteId = "AK-MED-8829-01",
-            ultimaVisita = "12 oct, 2023",
-            fechaNacimiento = "24/05/1958",
-            tipoSangre = "O+",
-            seguro = "BlueCross Shield",
-            telefono = "+502 55 43 210 987",
-            email = "r.casares@proveedor.com",
-            direccion = "Zona 10, Guatemala",
-            resumenClinico = listOf(
-                "Hipertension cronica (controlada)",
-                "Monitoreo de diabetes tipo 2",
-                "Ultimo lab: Glucosa 110 mg/dL",
-            ),
-            identidadVerificada = true,
-            notaRapida = "Paciente solicito copia impresa de resultados (sept.).",
-        ),
-        PacienteModel(
-            nombre = "Elena Rodriguez",
-            pacienteId = "AK-MED-1044-22",
-            ultimaVisita = "06 ene, 2024",
-            fechaNacimiento = "03/11/1989",
-            tipoSangre = "A-",
-            seguro = "Seguros Orion",
-            telefono = "+502 41 11 902 114",
-            email = "e.rodriguez@correo.com",
-            direccion = "Mixco, Guatemala",
-            resumenClinico = listOf(
-                "Alergia estacional",
-                "Asma leve intermitente",
-                "Ultimo lab: Espirometria normal",
-            ),
-            identidadVerificada = true,
-            notaRapida = "Prefiere atencion por la manana.",
-        ),
-        PacienteModel(
-            nombre = "Marcus Chen",
-            pacienteId = "AK-MED-3301-07",
-            ultimaVisita = "19 feb, 2024",
-            fechaNacimiento = "18/09/1976",
-            tipoSangre = "B+",
-            seguro = "Plan Familiar Vida",
-            telefono = "+502 50 09 441 330",
-            email = "m.chen@correo.com",
-            direccion = "Villa Nueva, Guatemala",
-            resumenClinico = listOf(
-                "Dolor lumbar recurrente",
-                "Fisioterapia en seguimiento",
-                "Ultimo lab: Rayos X sin hallazgos",
-            ),
-            identidadVerificada = false,
-            notaRapida = "Traer resultados de imagen anteriores.",
-        ),
-    )
-
-    private var filtrados: List<PacienteModel> = pacientes
-    private var seleccionado: PacienteModel? = null
+    private var filtrados: List<PacienteRecurrenteStore.PacienteRecord> = PacienteRecurrenteStore.all()
+    private var seleccionado: PacienteRecurrenteStore.PacienteRecord? = null
     private var selectedCard: Node? = null
 
     @FXML
@@ -129,15 +59,57 @@ class PacienteRecurrenteController {
         btnImprimir.setOnAction { accion("Imprimir ficha") }
         btnHistorial.setOnAction { accion("Ver historial") }
 
-        renderCards(pacientes)
-        seleccionar(pacientes.first())
+        renderCards(PacienteRecurrenteStore.all())
+        PacienteRecurrenteStore.all().firstOrNull()?.let { seleccionar(it) } ?: limpiarSeleccion()
+    }
+
+    /**
+     * Punto de entrada para navegación desde otras vistas (por ejemplo, “Actividad de hoy”).
+     * Intenta localizar por `pacienteId` (exacto) y luego por `nombre`.
+     */
+    fun openPaciente(pacienteId: String?, nombre: String?) {
+        lblAccionEstado.text = ""
+        val id = pacienteId?.trim().orEmpty()
+        val n = nombre?.trim().orEmpty()
+
+        fun tryOpen(query: String, preferExactId: Boolean) {
+            txtBuscar.text = query
+            aplicarFiltro()
+            if (filtrados.isEmpty()) return
+
+            val preferred =
+                if (preferExactId) filtrados.firstOrNull { it.pacienteId.equals(id, ignoreCase = true) }
+                else filtrados.firstOrNull { it.nombre.equals(n, ignoreCase = true) }
+            if (preferred != null) seleccionar(preferred)
+        }
+
+        if (id.isNotBlank()) {
+            tryOpen(id, preferExactId = true)
+            if (seleccionado != null) return
+        }
+
+        if (n.isNotBlank()) {
+            tryOpen(n, preferExactId = false)
+            if (seleccionado != null) return
+        }
+
+        lblAccionEstado.text = "No se encontró el paciente solicitado."
+    }
+
+    fun refresh() {
+        // Re-render según el query actual, pero leyendo datos desde el store (por ejemplo, luego de editar).
+        val keepId = seleccionado?.pacienteId
+        aplicarFiltro()
+        if (!keepId.isNullOrBlank()) {
+            filtrados.firstOrNull { it.pacienteId.equals(keepId, ignoreCase = true) }?.let { seleccionar(it) }
+        }
     }
 
     private fun aplicarFiltro() {
         val q = txtBuscar.text?.trim()?.lowercase().orEmpty()
         filtrados =
-            if (q.isBlank()) pacientes
-            else pacientes.filter {
+            if (q.isBlank()) PacienteRecurrenteStore.all()
+            else PacienteRecurrenteStore.all().filter {
                 it.nombre.lowercase().contains(q) ||
                     it.pacienteId.lowercase().contains(q) ||
                     it.fechaNacimiento.lowercase().contains(q)
@@ -147,7 +119,7 @@ class PacienteRecurrenteController {
         if (filtrados.isNotEmpty()) seleccionar(filtrados.first()) else limpiarSeleccion()
     }
 
-    private fun renderCards(items: List<PacienteModel>) {
+    private fun renderCards(items: List<PacienteRecurrenteStore.PacienteRecord>) {
         resultsContainer.children.clear()
         lblEncontrados.text = "Se encontraron ${items.size} registros"
 
@@ -156,7 +128,7 @@ class PacienteRecurrenteController {
         }
     }
 
-    private fun createPacienteCard(p: PacienteModel): VBox {
+    private fun createPacienteCard(p: PacienteRecurrenteStore.PacienteRecord): VBox {
         val avatar = Region().apply {
             styleClass.add("rp-avatar-shape")
             minWidth = 46.0
@@ -168,8 +140,18 @@ class PacienteRecurrenteController {
         val title = Label(p.nombre).apply { styleClass.add("rp-card-title-text-state-primary") }
         val subtitle = Label("ID Paciente: ${p.pacienteId}").apply { styleClass.add("muted") }
 
-        val lastVisit = Label("ULTIMA VEZ QUE VINO\n${p.ultimaVisita}").apply {
-            styleClass.add("rp-card-meta-text-state-primary")
+        val lastVisit = Label("ULTIMA VEZ QUE VINO\n${p.ultimaVisita}").apply { styleClass.add("rp-card-meta-text-state-primary") }
+
+        val btnEditar = Button("Editar").apply {
+            styleClass.add("rpe-card-edit-button")
+            setOnAction {
+                seleccionar(p)
+                onEditarPaciente?.invoke(p.pacienteId)
+            }
+        }
+
+        val metaBox = VBox(6.0).apply {
+            children.addAll(lastVisit, btnEditar)
         }
 
         val header = HBox(12.0).apply {
@@ -177,7 +159,7 @@ class PacienteRecurrenteController {
             children.addAll(
                 avatar,
                 VBox(2.0).apply { children.addAll(title, subtitle) }.also { HBox.setHgrow(it, Priority.ALWAYS) },
-                lastVisit,
+                metaBox,
             )
         }
 
@@ -201,7 +183,9 @@ class PacienteRecurrenteController {
 
         val leftList = VBox(6.0).apply {
             children.add(Label("RESUMEN CLINICO").apply { styleClass.add("rp-subtitle-text-state-accent") })
-            children.addAll(p.resumenClinico.map { Label("• $it").apply { styleClass.add("rp-list-text-state-primary") } })
+            children.addAll(
+                p.condicionesCronicas.take(3).map { Label("• $it").apply { styleClass.add("rp-list-text-state-primary") } },
+            )
         }
 
         val rightList = VBox(6.0).apply {
@@ -230,7 +214,7 @@ class PacienteRecurrenteController {
         return card
     }
 
-    private fun seleccionar(p: PacienteModel) {
+    private fun seleccionar(p: PacienteRecurrenteStore.PacienteRecord) {
         seleccionado = p
         chipIdentidad.text = if (p.identidadVerificada) "IDENTIDAD VERIFICADA" else "IDENTIDAD PENDIENTE"
         chipIdentidad.styleClass.remove("rp-chip-identity-tone-ok")
@@ -245,7 +229,7 @@ class PacienteRecurrenteController {
 
         // resaltar card seleccionada
         selectedCard?.styleClass?.remove("rp-patient-card-state-selected")
-        val newSelected = resultsContainer.children.firstOrNull { (it.userData as? PacienteModel) == p }
+        val newSelected = resultsContainer.children.firstOrNull { (it.userData as? PacienteRecurrenteStore.PacienteRecord) == p }
         newSelected?.styleClass?.add("rp-patient-card-state-selected")
         selectedCard = newSelected
     }

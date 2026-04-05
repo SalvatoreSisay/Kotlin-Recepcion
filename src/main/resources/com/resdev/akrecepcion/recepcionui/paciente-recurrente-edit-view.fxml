@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.resdev.akrecepcion.recepcionui.PacienteRecurrenteEditController"
+           styleClass="rpe-root">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="rp-scroll-pane">
+        <VBox spacing="18.0" styleClass="rp-content">
+            <padding>
+                <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                    <Label fx:id="lblTitulo" text="Editar información de paciente" styleClass="wizard-title-text-state-primary"/>
+                    <Label fx:id="lblSubtitulo" text="Actualizando registro para ID: -" styleClass="muted"/>
+                    <Label fx:id="lblEstado" styleClass="rp-action-status-text-state-muted" wrapText="true"/>
+                </VBox>
+                <HBox spacing="10.0">
+                    <Button fx:id="btnCancelar" text="Cancelar" styleClass="wizard-button-tone-secondary"/>
+                    <Button fx:id="btnGuardar" text="Guardar cambios" styleClass="rp-button-fill-primary"/>
+                </HBox>
+            </HBox>
+
+            <HBox spacing="14.0">
+                <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                    <VBox spacing="10.0" styleClass="rp-side-card">
+                        <padding>
+                            <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+                        </padding>
+                        <Label text="Información personal" styleClass="card-title"/>
+
+                        <HBox spacing="12.0">
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <Label text="NOMBRE COMPLETO" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtNombre" promptText="Nombre completo" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0">
+                                <Label text="FECHA DE NACIMIENTO" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtFechaNac" promptText="dd/mm/aaaa" styleClass="wizard-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="12.0">
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <Label text="ID PACIENTE" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtPacienteId" promptText="-" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <Label text="TELÉFONO" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtTelefono" promptText="+502 ..." styleClass="wizard-field"/>
+                            </VBox>
+                        </HBox>
+
+                        <HBox spacing="12.0">
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <Label text="EMAIL" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtEmail" promptText="correo@dominio.com" styleClass="wizard-field"/>
+                            </VBox>
+                            <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                                <Label text="DIRECCIÓN" styleClass="wizard-field-label"/>
+                                <TextField fx:id="txtDireccion" promptText="Dirección de residencia" styleClass="wizard-field"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="10.0" styleClass="rp-side-card">
+                        <padding>
+                            <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+                        </padding>
+                        <Label text="Historial clínico" styleClass="card-title"/>
+
+                        <HBox spacing="14.0">
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="rpe-sub-card">
+                                <padding>
+                                    <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                </padding>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Alergias" styleClass="rp-subtitle-text-state-accent"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                </HBox>
+                                <FlowPane fx:id="flowAlergias" hgap="8.0" vgap="8.0" prefWrapLength="520.0"/>
+                                <HBox spacing="10.0">
+                                    <TextField fx:id="txtNuevaAlergia" promptText="Agregar alergia..." styleClass="wizard-field" HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="btnAgregarAlergia" text="Agregar" styleClass="rp-action-button-tone-neutral"/>
+                                </HBox>
+                            </VBox>
+
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS" styleClass="rpe-sub-card">
+                                <padding>
+                                    <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                </padding>
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <Label text="Condiciones crónicas" styleClass="rp-subtitle-text-state-accent"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                </HBox>
+                                <FlowPane fx:id="flowCondiciones" hgap="8.0" vgap="8.0" prefWrapLength="520.0"/>
+                                <HBox spacing="10.0">
+                                    <TextField fx:id="txtNuevaCondicion" promptText="Agregar condición..." styleClass="wizard-field" HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="btnAgregarCondicion" text="Agregar" styleClass="rp-action-button-tone-neutral"/>
+                                </HBox>
+                            </VBox>
+                        </HBox>
+
+                        <Separator/>
+
+                        <VBox spacing="10.0">
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <Label text="Medicamentos activos" styleClass="rp-subtitle-text-state-accent"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                            </HBox>
+
+                            <VBox fx:id="medsContainer" spacing="8.0"/>
+
+                            <HBox spacing="10.0">
+                                <TextField fx:id="txtMedNombre" promptText="Medicamento" styleClass="wizard-field" HBox.hgrow="ALWAYS"/>
+                                <TextField fx:id="txtMedDosis" promptText="Dosis" styleClass="wizard-field"/>
+                                <TextField fx:id="txtMedFrecuencia" promptText="Frecuencia" styleClass="wizard-field" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnAgregarMed" text="Agregar" styleClass="rp-action-button-tone-neutral"/>
+                            </HBox>
+                        </VBox>
+
+                        <Separator/>
+
+                        <VBox spacing="10.0">
+                            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                <Label text="Visitas recientes y notas" styleClass="rp-subtitle-text-state-accent"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                            </HBox>
+
+                            <VBox fx:id="visitasContainer" spacing="10.0"/>
+                        </VBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Aside: give the "Resumen de última visita" card a bit more room to avoid ellipsis -->
+                <VBox spacing="12.0" prefWidth="420.0">
+                    <VBox spacing="10.0" styleClass="rp-side-card">
+                        <padding>
+                            <Insets top="14.0" right="14.0" bottom="14.0" left="14.0"/>
+                        </padding>
+                        <Label text="Resumen de última visita" styleClass="card-title"/>
+
+                        <VBox spacing="4.0">
+                            <Label text="FECHA" styleClass="wizard-field-label"/>
+                            <Label fx:id="lblUltimaVisitaFecha" text="-" styleClass="rp-action-patient-text-state-primary"/>
+                        </VBox>
+
+                        <VBox spacing="4.0">
+                            <Label text="ESTADO" styleClass="wizard-field-label"/>
+                            <Label fx:id="lblUltimaVisitaTipo" text="-" styleClass="muted"/>
+                        </VBox>
+
+                        <VBox spacing="4.0">
+                            <Label text="NOTA RÁPIDA" styleClass="wizard-field-label"/>
+                            <Label fx:id="lblUltimaVisitaTitulo" text="-" wrapText="true" styleClass="rp-note-text-state-primary"/>
+                        </VBox>
+
+                        <Button fx:id="btnVerHistorial" text="Ver historial completo" styleClass="rp-button-tone-link"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>

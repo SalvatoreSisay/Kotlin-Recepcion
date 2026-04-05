@@ -5,11 +5,12 @@ import javafx.event.ActionEvent
 import javafx.fxml.FXML
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Insets
+import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.control.TableColumn
-import javafx.scene.control.TableView
-import javafx.scene.control.cell.PropertyValueFactory
+import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
+import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.Parent
@@ -19,6 +20,7 @@ class PanelPrincipalController {
 
     data class ActividadPacienteRow(
         val nombre: String,
+        val pacienteId: String? = null,
         val tipo: String,
         val estado: String,
         val hora: String,
@@ -33,11 +35,7 @@ class PanelPrincipalController {
     @FXML private lateinit var lblSaludo: Label
     @FXML private lateinit var lblResumen: Label
 
-    @FXML private lateinit var tablaActividad: TableView<ActividadPacienteRow>
-    @FXML private lateinit var colNombre: TableColumn<ActividadPacienteRow, String>
-    @FXML private lateinit var colTipo: TableColumn<ActividadPacienteRow, String>
-    @FXML private lateinit var colEstado: TableColumn<ActividadPacienteRow, String>
-    @FXML private lateinit var colHora: TableColumn<ActividadPacienteRow, String>
+    @FXML private lateinit var actividadRowsContainer: VBox
 
     @FXML
     private fun initialize() {
@@ -46,19 +44,108 @@ class PanelPrincipalController {
         lblResumen.text =
             "Tu espacio digital para la atención del paciente. Registra nuevos ingresos y agiliza el flujo de recepción."
 
-        colNombre.cellValueFactory = PropertyValueFactory("nombre")
-        colTipo.cellValueFactory = PropertyValueFactory("tipo")
-        colEstado.cellValueFactory = PropertyValueFactory("estado")
-        colHora.cellValueFactory = PropertyValueFactory("hora")
-
-        tablaActividad.items = FXCollections.observableArrayList(
-            ActividadPacienteRow("Elena Rodriguez", "Recurrente", "Verificado", "09:15"),
-            ActividadPacienteRow("Marcus Chen", "Nuevo", "Procesando", "10:04"),
-            ActividadPacienteRow("Sarah Jenkins", "Recurrente", "Verificado", "10:30"),
+        val actividad = FXCollections.observableArrayList(
+            ActividadPacienteRow(nombre = "Elena Rodriguez", pacienteId = "AK-MED-1044-22", tipo = "Recurrente", estado = "Verificado", hora = "09:15"),
+            ActividadPacienteRow(nombre = "Marcus Chen", pacienteId = "AK-MED-3301-07", tipo = "Nuevo", estado = "Procesando", hora = "10:04"),
+            ActividadPacienteRow(nombre = "Sarah Jenkins", pacienteId = null, tipo = "Recurrente", estado = "Verificado", hora = "10:30"),
         )
+        renderActividadRows(actividad)
 
         // Mark the first nav button as active by default.
         navContainer.children.filterIsInstance<Button>().firstOrNull()?.let { setNavActivo(it) }
+    }
+
+    private fun renderActividadRows(items: List<ActividadPacienteRow>) {
+        actividadRowsContainer.children.setAll(items.map { createActividadRow(it) })
+    }
+
+    private fun createActividadRow(r: ActividadPacienteRow): Node {
+        val initials =
+            r.nombre
+                .trim()
+                .split(Regex("\\s+"))
+                .filter { it.isNotBlank() }
+                .take(2)
+                .map { it.first().uppercaseChar() }
+                .joinToString("")
+                .ifBlank { "P" }
+
+        val avatar = StackPane(Label(initials).apply { styleClass.add("ps-avatar-text") }).apply {
+            styleClass.add("ps-avatar")
+            minWidth = 36.0
+            minHeight = 36.0
+            maxWidth = 36.0
+            maxHeight = 36.0
+        }
+
+        val patientMeta = r.pacienteId?.takeIf { it.isNotBlank() }?.let { "ID: $it" } ?: " "
+        val patientBlock = HBox(12.0).apply {
+            children.addAll(
+                avatar,
+                VBox(2.0).apply {
+                    children.addAll(
+                        Label(r.nombre).apply { styleClass.add("ps-patient-name") },
+                        Label(patientMeta).apply { styleClass.add("muted") },
+                    )
+                },
+            )
+            HBox.setHgrow(this, Priority.ALWAYS)
+        }
+
+        val tipoCell = VBox(2.0).apply {
+            prefWidth = 130.0
+            children.addAll(
+                Label(r.tipo).apply { styleClass.add("ps-cell-strong") },
+                Region().apply { minHeight = 1.0 },
+            )
+        }
+
+        val statusChip = Label(r.estado).apply { styleClass.addAll("ps-status-chip", estadoToneClass(r.estado)) }
+        val estadoCell = HBox(statusChip).apply {
+            prefWidth = 130.0
+            alignmentProperty().set(javafx.geometry.Pos.CENTER_LEFT)
+        }
+
+        val horaCell = VBox(2.0).apply {
+            prefWidth = 90.0
+            children.addAll(
+                Label(r.hora).apply { styleClass.add("ps-cell-strong") },
+                Region().apply { minHeight = 1.0 },
+            )
+        }
+
+        val actions = HBox(8.0).apply {
+            prefWidth = 120.0
+            alignmentProperty().set(javafx.geometry.Pos.CENTER_RIGHT)
+            children.add(
+                Button("Ver").apply {
+                    styleClass.add("ps-action-button")
+                    setOnAction {
+                        openPacienteFromActividad(r)
+                    }
+                },
+            )
+        }
+
+        return HBox(0.0).apply {
+            styleClass.add("ps-row")
+            children.addAll(
+                patientBlock,
+                tipoCell,
+                estadoCell,
+                horaCell,
+                actions,
+            )
+        }
+    }
+
+    private fun estadoToneClass(estado: String): String {
+        val e = estado.trim().lowercase()
+        return when {
+            e.contains("verific") || e.contains("complet") || e.contains("list") -> "ps-status-chip-tone-ok"
+            e.contains("proces") || e.contains("progres") || e.contains("pend") -> "ps-status-chip-tone-warn"
+            else -> "ps-status-chip-tone-muted"
+        }
     }
 
     @FXML
@@ -73,7 +160,7 @@ class PanelPrincipalController {
             "paciente-recurrente" -> showPacienteRecurrente()
             "busqueda-pacientes" -> showBusquedaPacientes()
             "agendar" -> showAgendarCita()
-            "reportes" -> showPlaceholder("Reportes", "Sección en desarrollo.")
+            "reportes" -> showReportes()
             "configuracion" -> showPlaceholder("Configuración", "Sección en desarrollo.")
             "ayuda" -> showPlaceholder("Ayuda", "Sección en desarrollo.")
             else -> {
@@ -89,8 +176,13 @@ class PanelPrincipalController {
 
     private var nuevoPacienteRoot: Parent? = null
     private var pacienteRecurrenteRoot: Parent? = null
+    private var pacienteRecurrenteController: PacienteRecurrenteController? = null
+    private var pacienteRecurrenteEditRoot: Parent? = null
+    private var pacienteRecurrenteEditController: PacienteRecurrenteEditController? = null
     private var busquedaPacientesRoot: Parent? = null
     private var agendarCitaRoot: Parent? = null
+    private var reportesRoot: Parent? = null
+    private var reportesController: ReportesController? = null
     private var perfilRoot: Parent? = null
     private var perfilController: PerfilController? = null
 
@@ -121,6 +213,10 @@ class PanelPrincipalController {
             val url = PanelPrincipalController::class.java.getResource("/com/resdev/akrecepcion/recepcionui/paciente-recurrente-view.fxml")
             val loader = FXMLLoader(url)
             pacienteRecurrenteRoot = loader.load()
+            pacienteRecurrenteController = loader.getController()
+            pacienteRecurrenteController?.onEditarPaciente = { pacienteId ->
+                showPacienteRecurrenteEdit(pacienteId)
+            }
         }
 
         dashboardView.isVisible = false
@@ -128,6 +224,51 @@ class PanelPrincipalController {
         navViewHost.children.setAll(pacienteRecurrenteRoot)
         navViewHost.isVisible = true
         navViewHost.isManaged = true
+    }
+
+    private fun showPacienteRecurrenteEdit(pacienteId: String) {
+        if (pacienteRecurrenteEditRoot == null) {
+            val url =
+                PanelPrincipalController::class.java.getResource(
+                    "/com/resdev/akrecepcion/recepcionui/paciente-recurrente-edit-view.fxml",
+                )
+            val loader = FXMLLoader(url)
+            pacienteRecurrenteEditRoot = loader.load()
+            pacienteRecurrenteEditController = loader.getController()
+            pacienteRecurrenteEditController?.onCancel = {
+                showPacienteRecurrente()
+                pacienteRecurrenteController?.refresh()
+            }
+            pacienteRecurrenteEditController?.onSaved = {
+                // Guardar no navega: el usuario puede seguir editando o presionar "Cancelar" para volver.
+                // El store ya quedó actualizado; cuando se vuelva al listado se re-renderiza con refresh().
+                pacienteRecurrenteController?.refresh()
+            }
+            // Historial aún vive como “demo” en la vista de recurrente; por ahora vuelve y selecciona.
+            pacienteRecurrenteEditController?.onOpenHistorial = {
+                showPacienteRecurrente()
+                pacienteRecurrenteController?.refresh()
+                pacienteRecurrenteController?.openPaciente(pacienteId = it, nombre = null)
+            }
+        }
+
+        dashboardView.isVisible = false
+        dashboardView.isManaged = false
+        navViewHost.children.setAll(pacienteRecurrenteEditRoot)
+        navViewHost.isVisible = true
+        navViewHost.isManaged = true
+
+        pacienteRecurrenteEditController?.openPaciente(pacienteId)
+    }
+
+    private fun openPacienteFromActividad(r: ActividadPacienteRow) {
+        // En la app, el “perfil/historial” más cercano hoy está en la vista de paciente recurrente.
+        navContainer.children
+            .filterIsInstance<Button>()
+            .firstOrNull { (it.userData as? String)?.trim() == "paciente-recurrente" }
+            ?.let { setNavActivo(it) }
+        showPacienteRecurrente()
+        pacienteRecurrenteController?.openPaciente(pacienteId = r.pacienteId, nombre = r.nombre)
     }
 
     private fun showBusquedaPacientes() {
@@ -154,6 +295,22 @@ class PanelPrincipalController {
         dashboardView.isVisible = false
         dashboardView.isManaged = false
         navViewHost.children.setAll(agendarCitaRoot)
+        navViewHost.isVisible = true
+        navViewHost.isManaged = true
+    }
+
+    private fun showReportes() {
+        if (reportesRoot == null) {
+            val url = PanelPrincipalController::class.java.getResource("/com/resdev/akrecepcion/recepcionui/reportes-view.fxml")
+            val loader = FXMLLoader(url)
+            reportesRoot = loader.load()
+            reportesController = loader.getController()
+        }
+
+        reportesController?.refresh()
+        dashboardView.isVisible = false
+        dashboardView.isManaged = false
+        navViewHost.children.setAll(reportesRoot)
         navViewHost.isVisible = true
         navViewHost.isManaged = true
     }

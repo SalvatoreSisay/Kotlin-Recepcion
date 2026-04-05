@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.String?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.resdev.akrecepcion.recepcionui.ReportesController"
+           styleClass="re-root">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="re-scroll-pane">
+        <VBox spacing="18.0" styleClass="re-content">
+            <padding>
+                <Insets top="22.0" right="18.0" bottom="22.0" left="18.0"/>
+            </padding>
+
+            <HBox spacing="12.0" alignment="CENTER_LEFT">
+                <VBox spacing="6.0" HBox.hgrow="ALWAYS">
+                    <Label text="Reportes" styleClass="wizard-title-text-state-primary"/>
+                    <Label text="Dashboard de admisiones y actividad clínica por periodo."
+                           wrapText="true"
+                           styleClass="muted"/>
+                </VBox>
+
+                <HBox spacing="0.0" alignment="CENTER" styleClass="re-period-group">
+                    <Button fx:id="btnMensual" text="Mensual" styleClass="re-period-button"/>
+                    <Button fx:id="btnTrimestral" text="Trimestral" styleClass="re-period-button"/>
+                    <Button fx:id="btnAnual" text="Anual" styleClass="re-period-button"/>
+                </HBox>
+            </HBox>
+
+            <HBox spacing="10.0">
+                <VBox spacing="3.0" styleClass="stat">
+                    <Label fx:id="lblIngresosValue" text="0" styleClass="stat-value"/>
+                    <Label text="INGRESOS" styleClass="stat-label"/>
+                </VBox>
+                <VBox spacing="3.0" styleClass="stat">
+                    <Label fx:id="lblNuevosValue" text="0" styleClass="stat-value"/>
+                    <Label text="NUEVOS" styleClass="stat-label"/>
+                </VBox>
+                <VBox spacing="3.0" styleClass="stat">
+                    <Label fx:id="lblRecurrentesValue" text="0" styleClass="stat-value"/>
+                    <Label text="RECURRENTES" styleClass="stat-label"/>
+                </VBox>
+                <VBox spacing="3.0" styleClass="stat">
+                    <Label fx:id="lblProcedimientosValue" text="0" styleClass="stat-value"/>
+                    <Label text="PROCEDIMIENTOS" styleClass="stat-label"/>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="14.0">
+                <VBox spacing="10.0" HBox.hgrow="ALWAYS" styleClass="card">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Distribución de pacientes" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblDistribucionMeta" text="-" styleClass="muted"/>
+                    </HBox>
+                    <PieChart fx:id="pieDistribucion" prefHeight="260.0" styleClass="re-pie-chart"/>
+                </VBox>
+
+                <VBox spacing="10.0" HBox.hgrow="ALWAYS" styleClass="card">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Médicos con más pacientes" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblMedicosMeta" text="-" styleClass="muted"/>
+                    </HBox>
+                    <BarChart fx:id="barMedicos" prefHeight="260.0" styleClass="re-bar-chart">
+                        <xAxis>
+                            <CategoryAxis/>
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis/>
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="14.0">
+                <VBox spacing="10.0" HBox.hgrow="ALWAYS" styleClass="card">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Diagnósticos más ingresados" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="lblDiagnosticosMeta" text="-" styleClass="muted"/>
+                    </HBox>
+                    <VBox fx:id="topDiagnosticosContainer" spacing="10.0"/>
+                </VBox>
+
+                <VBox spacing="10.0" prefWidth="330.0" styleClass="card">
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Nuevos vs recurrentes" styleClass="section-title"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="Proporción" styleClass="muted"/>
+                    </HBox>
+
+                    <VBox spacing="8.0">
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Nuevos" styleClass="muted"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblNuevosPct" text="0%" styleClass="re-metric-strong"/>
+                        </HBox>
+                        <ProgressBar fx:id="pbNuevos" progress="0.0" styleClass="re-progress"/>
+
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Recurrentes" styleClass="muted"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblRecurrentesPct" text="0%" styleClass="re-metric-strong"/>
+                        </HBox>
+                        <ProgressBar fx:id="pbRecurrentes" progress="0.0">
+                            <styleClass>
+                                <String fx:value="re-progress"/>
+                                <String fx:value="re-progress-tone-amber"/>
+                            </styleClass>
+                        </ProgressBar>
+                    </VBox>
+
+                    <Separator/>
+
+                    <VBox spacing="10.0">
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Tiempo promedio de atención" styleClass="muted"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblTiempoProm" text="-" styleClass="re-metric-strong"/>
+                        </HBox>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <Label text="Diagnóstico principal" styleClass="muted"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblDiagPrincipal" text="-" styleClass="re-metric-strong"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <HBox spacing="14.0">
+                <VBox HBox.hgrow="ALWAYS" styleClass="ps-table">
+                    <HBox styleClass="ps-table-header" alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="ENFERMEDADES RECIENTES" styleClass="ps-th" HBox.hgrow="ALWAYS"/>
+                        <Label text="Últimos registros" styleClass="muted"/>
+                    </HBox>
+
+                    <Separator styleClass="ps-table-sep"/>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="re-table-cols">
+                        <Label text="DEPTO" styleClass="ps-th" prefWidth="130.0"/>
+                        <Label text="PROCEDIMIENTO" styleClass="ps-th" HBox.hgrow="ALWAYS"/>
+                        <Label text="PACIENTES" styleClass="ps-th" prefWidth="90.0" alignment="CENTER_RIGHT"/>
+                    </HBox>
+
+                    <Separator styleClass="ps-table-sep"/>
+
+                    <VBox fx:id="enfermedadesRowsContainer" styleClass="ps-table-rows"/>
+                </VBox>
+
+                <VBox HBox.hgrow="ALWAYS" styleClass="ps-table">
+                    <HBox styleClass="ps-table-header" alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="OPERACIONES" styleClass="ps-th" HBox.hgrow="ALWAYS"/>
+                        <Label text="Últimos procedimientos" styleClass="muted"/>
+                    </HBox>
+
+                    <Separator styleClass="ps-table-sep"/>
+
+                    <HBox spacing="10.0" alignment="CENTER_LEFT" styleClass="re-table-cols">
+                        <Label text="DEPTO" styleClass="ps-th" prefWidth="130.0"/>
+                        <Label text="PROCEDIMIENTO" styleClass="ps-th" HBox.hgrow="ALWAYS"/>
+                        <Label text="PACIENTES" styleClass="ps-th" prefWidth="90.0" alignment="CENTER_RIGHT"/>
+                    </HBox>
+
+                    <Separator styleClass="ps-table-sep"/>
+
+                    <VBox fx:id="operacionesRowsContainer" styleClass="ps-table-rows"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</StackPane>
