@@ -7,6 +7,11 @@ module com.resdev.akrecepcion.recepcionui {
     requires com.dlsc.formsfx;
     requires org.kordamp.ikonli.javafx;
 
+    requires java.sql;
+    requires com.zaxxer.hikari;
+    requires org.mariadb.jdbc;
+
+
     opens com.resdev.akrecepcion.recepcionui to javafx.fxml;
     exports com.resdev.akrecepcion.recepcionui;
 }

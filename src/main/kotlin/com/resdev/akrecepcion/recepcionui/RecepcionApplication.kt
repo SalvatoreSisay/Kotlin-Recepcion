@@ -7,6 +7,8 @@ import javafx.scene.Scene
 import javafx.scene.Parent
 import javafx.stage.Stage
 import javafx.util.Duration
+import com.resdev.akrecepcion.recepcionui.db.Env
+import com.resdev.akrecepcion.recepcionui.db.DataSourceProvider
 
 class RecepcionApplication : Application() {
     private companion object {
@@ -16,12 +18,20 @@ class RecepcionApplication : Application() {
     }
 
     override fun start(stage: Stage) {
+        // Paso 3: carga opcional de ".env" para desarrollo local (no es requerido en prod).
+        Env.preload()
+
         val scene = Scene(loadLogin(stage), 1200.0, 760.0)
         stage.title = "Recepción UI"
         stage.scene = scene
         stage.minWidth = 980.0
         stage.minHeight = 640.0
         stage.show()
+    }
+
+    override fun stop() {
+        // Cierra el pool para liberar recursos al salir.
+        DataSourceProvider.close()
     }
 
     private fun showPanelPrincipal(stage: Stage) {

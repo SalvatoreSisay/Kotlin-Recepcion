@@ -18,6 +18,9 @@ out/
 !**/src/test/**/out/
 Recursos_inspiraciones/
 
+# Local environment variables (do not commit secrets)
+.env
+
 
 ### Eclipse ###
 .apt_generated
