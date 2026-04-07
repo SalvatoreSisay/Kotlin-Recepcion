@@ -15,6 +15,8 @@ object AppSession {
         var correo: String,
         var telefono: String,
         var notificaciones: Boolean,
+        var idUsuario: Int? = null,
+        var idNivel: Int? = null,
         var estado: String = "ACTIVO",
         var lastUpdated: LocalDateTime = LocalDateTime.now(),
     )
@@ -38,4 +40,3 @@ object AppSession {
         password = newPassword
     }
 }
-

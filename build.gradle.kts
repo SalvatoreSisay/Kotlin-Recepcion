@@ -23,7 +23,7 @@ tasks.withType<JavaCompile> {
 
 application {
     mainModule.set("com.resdev.akrecepcion.recepcionui")
-    // Use a Kotlin main() entrypoint to avoid JavaFX/module launcher edge cases.
+    // Utiliza un punto de entrada `main()` de Kotlin para evitar casos extremos relacionados con JavaFX o el lanzador de módulos.
     mainClass.set("com.resdev.akrecepcion.recepcionui.LauncherKt")
 }
 kotlin {

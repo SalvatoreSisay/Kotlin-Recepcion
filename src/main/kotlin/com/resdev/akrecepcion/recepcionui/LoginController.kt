@@ -16,6 +16,17 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.util.Duration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.javafx.*
+import com.resdev.akrecepcion.recepcionui.dao.jdbc.UsuarioDaoJdbc
+import com.resdev.akrecepcion.recepcionui.repository.impl.UsuarioRepositoryImpl
+import com.resdev.akrecepcion.recepcionui.service.AuthService
+import com.resdev.akrecepcion.recepcionui.service.LoginResult
 
 class LoginController {
     var onLoginSuccess: (() -> Unit)? = null
@@ -30,6 +41,9 @@ class LoginController {
     @FXML private lateinit var popupCard: VBox
     @FXML private lateinit var lblPopupMensaje: Label
     @FXML private lateinit var btnPopupAceptar: Button
+
+    private val scope = CoroutineScope(Dispatchers.JavaFx + SupervisorJob())
+    private val authService = AuthService(UsuarioRepositoryImpl(UsuarioDaoJdbc()))
 
     @FXML
     private fun initialize() {
@@ -68,23 +82,64 @@ class LoginController {
         val usuario = txtUsuario.text?.trim().orEmpty()
         val contrasena = txtContrasena.text.orEmpty()
 
-        if (usuario == "admin" && contrasena == "1234") {
-            // Demo: precarga información de perfil para la sesión.
-            AppSession.currentUser =
-                AppSession.currentUser.copy(
-                    usuario = usuario,
-                    // Si el usuario cambió previamente el nombre en Perfil, lo mantenemos.
-                )
-            AppSession.updatePassword("1234")
-            onLoginSuccess?.invoke()
-            return
-        }
+        scope.launch {
+            try {
+                val res =
+                    withContext(Dispatchers.IO) {
+                        authService.login(usuario, contrasena)
+                    }
 
-        mostrarErrorCredenciales()
+                when (res) {
+                    is LoginResult.Ok -> {
+                        AppSession.currentUser =
+                            AppSession.currentUser.copy(
+                                nombreCompleto = res.usuario.nombreUsuario,
+                                usuario = res.usuario.usuario,
+                                rol = res.rol,
+                                departamento = res.departamento,
+                                idUsuario = res.usuario.idUsuario,
+                                idNivel = res.usuario.idNivel,
+                            )
+                        // TODO: esto solo mantiene compatibilidad con el "cambio de contraseña" demo.
+                        // Cuando implementemos cambio real en DB, se elimina este estado en memoria.
+                        AppSession.updatePassword(contrasena)
+                        scope.cancel()
+                        onLoginSuccess?.invoke()
+                    }
+                    LoginResult.InvalidCredentials -> {
+                        mostrarErrorCredenciales()
+                    }
+                }
+            } catch (e: Exception) {
+                mostrarErrorGeneral("No se pudo conectar a la base de datos. Verifica el servidor y credenciales.")
+            }
+        }
     }
 
     private fun mostrarErrorCredenciales() {
         lblPopupMensaje.text = "A ingresado mal el usuario o contraseña, intente de nuevo"
+        popupOverlay.isVisible = true
+        popupOverlay.isManaged = true
+
+        popupCard.opacity = 0.0
+        popupCard.scaleX = 0.92
+        popupCard.scaleY = 0.92
+
+        val fade = FadeTransition(Duration.millis(180.0), popupCard).apply {
+            fromValue = 0.0
+            toValue = 1.0
+        }
+        val scale = ScaleTransition(Duration.millis(180.0), popupCard).apply {
+            fromX = 0.92
+            fromY = 0.92
+            toX = 1.0
+            toY = 1.0
+        }
+        ParallelTransition(fade, scale).play()
+    }
+
+    private fun mostrarErrorGeneral(msg: String) {
+        lblPopupMensaje.text = msg
         popupOverlay.isVisible = true
         popupOverlay.isManaged = true
 
