@@ -1,5 +1,9 @@
 package com.resdev.akrecepcion.recepcionui
 
+import com.resdev.akrecepcion.recepcionui.dao.jdbc.PacienteBusquedaDaoJdbc
+import com.resdev.akrecepcion.recepcionui.model.Paciente
+import com.resdev.akrecepcion.recepcionui.repository.PacienteRepository
+import com.resdev.akrecepcion.recepcionui.repository.impl.PacienteRepositoryImpl
 import javafx.animation.FadeTransition
 import javafx.animation.ParallelTransition
 import javafx.animation.PauseTransition
@@ -13,17 +17,25 @@ import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
-//import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.util.Duration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.javafx.JavaFx
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class BusquedaPacientesController {
     private enum class EstadoFiltro(val label: String) {
         TODOS("Todos los estados"),
         ACTIVO("Activo"),
-        OBSERVACION("En observación"),
-        EGRESADO("Egresado"),
     }
 
     private enum class RangoFiltro(val label: String) {
@@ -35,12 +47,11 @@ class BusquedaPacientesController {
     private data class PacienteRow(
         val nombre: String,
         val pacienteId: String,
-        val edad: Int,
+        val edad: String,
         val sexo: String,
         val telefono: String,
         val ultimaVisita: String,
         val estado: EstadoFiltro,
-        val departamento: String,
     )
 
     @FXML private lateinit var txtBuscar: TextField
@@ -53,35 +64,25 @@ class BusquedaPacientesController {
     @FXML private lateinit var lblPagina: Label
     @FXML private lateinit var paginationContainer: HBox
 
-    private val pacientes = listOf(
-        PacienteRow("Elena Rodríguez", "CS-88219", 34, "Femenino", "+1 (555) 012-984", "12 oct, 2023", EstadoFiltro.ACTIVO, "Pediatría"),
-        PacienteRow("Marcus Kinsley", "CS-91102", 58, "Masculino", "+1 (555) 882-0122", "29 sept, 2023", EstadoFiltro.OBSERVACION, "Emergencias"),
-        PacienteRow("Anita Wu", "CS-77420", 22, "Femenino", "+1 (555) 301-7721", "15 ago, 2023", EstadoFiltro.EGRESADO, "Laboratorio"),
-        PacienteRow("Jonathan Thorne", "CS-82210", 45, "Masculino", "+1 (555) 443-1109", "Hoy", EstadoFiltro.ACTIVO, "Medicina interna"),
-        PacienteRow("Ricardo Casares", "AK-8829-01", 66, "Masculino", "+502 55 43 210 987", "19 feb, 2024", EstadoFiltro.ACTIVO, "Medicina interna"),
-        PacienteRow("Sarah Jenkins", "AK-1044-22", 36, "Femenino", "+502 41 11 902 114", "06 ene, 2024", EstadoFiltro.ACTIVO, "Pediatría"),
-        PacienteRow("Marcus Chen", "AK-3301-07", 49, "Masculino", "+502 50 09 441 330", "12 nov, 2023", EstadoFiltro.OBSERVACION, "Emergencias"),
-        PacienteRow("Lucía Arévalo", "AK-4411-09", 29, "Femenino", "+502 33 90 110 771", "01 dic, 2023", EstadoFiltro.EGRESADO, "Laboratorio"),
-        PacienteRow("Diego Pérez", "AK-1201-03", 40, "Masculino", "+502 49 80 201 998", "10 oct, 2023", EstadoFiltro.ACTIVO, "Medicina interna"),
-        PacienteRow("Andrea Gómez", "AK-8711-16", 51, "Femenino", "+502 22 10 902 441", "21 ene, 2024", EstadoFiltro.OBSERVACION, "Emergencias"),
-        PacienteRow("Sofía Castillo", "AK-7731-12", 19, "Femenino", "+502 55 12 331 001", "15 feb, 2024", EstadoFiltro.ACTIVO, "Pediatría"),
-        PacienteRow("Jorge López", "AK-3400-22", 62, "Masculino", "+502 55 09 113 222", "03 mar, 2024", EstadoFiltro.EGRESADO, "Medicina interna"),
-        PacienteRow("Valeria Méndez", "AK-9011-55", 27, "Femenino", "+502 40 11 902 771", "18 dic, 2023", EstadoFiltro.ACTIVO, "Laboratorio"),
-        PacienteRow("Pedro Aguilar", "AK-6622-18", 38, "Masculino", "+502 31 09 100 700", "07 ene, 2024", EstadoFiltro.ACTIVO, "Emergencias"),
-    )
-
     private var estadoFiltro: EstadoFiltro = EstadoFiltro.TODOS
-    private var departamentoFiltro: String? = null
-    private var rangoFiltro: RangoFiltro = RangoFiltro.H24
+    private var rangoFiltro: RangoFiltro = RangoFiltro.D30
 
     private val pageSize = 6
     private var currentPage = 1
 
     private val debounce = PauseTransition(Duration.millis(160.0))
     private var runningSwap: ParallelTransition? = null
+    private var fetchJob: Job? = null
+
+    private val repo: PacienteRepository = PacienteRepositoryImpl(PacienteBusquedaDaoJdbc())
+    private val scope = CoroutineScope(Dispatchers.JavaFx + SupervisorJob())
+
+    private val esLocale = Locale("es", "GT")
+    private val fmtFecha = DateTimeFormatter.ofPattern("dd MMM, yyyy", esLocale)
 
     @FXML
     private fun initialize() {
+        btnRango.text = rangoFiltro.label
         btnBuscar.setOnAction { aplicarFiltro(immediate = true) }
         txtBuscar.setOnAction { aplicarFiltro(immediate = true) }
         txtBuscar.textProperty().addListener { _, _, _ -> scheduleFiltro() }
@@ -93,11 +94,11 @@ class BusquedaPacientesController {
         }
 
         btnEstado.setOnAction { cycleEstado() }
-        btnDepartamento.setOnAction { cycleDepartamento() }
+        btnDepartamento.isDisable = true
         btnRango.setOnAction { cycleRango() }
 
         Tooltip.install(btnEstado, Tooltip("Filtra por estado del paciente"))
-        Tooltip.install(btnDepartamento, Tooltip("Filtra por área/departamento"))
+        Tooltip.install(btnDepartamento, Tooltip("Filtro pendiente de definición"))
         Tooltip.install(btnRango, Tooltip("Acota la búsqueda por recencia"))
 
         debounce.setOnFinished { aplicarFiltro(immediate = false) }
@@ -106,24 +107,13 @@ class BusquedaPacientesController {
 
     private fun scheduleFiltro() {
         debounce.stop()
+        currentPage = 1
         debounce.playFromStart()
     }
 
     private fun cycleEstado() {
         estadoFiltro = EstadoFiltro.entries[(estadoFiltro.ordinal + 1) % EstadoFiltro.entries.size]
         btnEstado.text = estadoFiltro.label
-        currentPage = 1
-        aplicarFiltro(immediate = true)
-    }
-
-    private val departamentos = listOf("Todos", "Emergencias", "Pediatría", "Laboratorio", "Medicina interna")
-
-    private fun cycleDepartamento() {
-        val actual = departamentoFiltro ?: "Todos"
-        val idx = departamentos.indexOf(actual).coerceAtLeast(0)
-        val next = departamentos[(idx + 1) % departamentos.size]
-        departamentoFiltro = if (next == "Todos") null else next
-        btnDepartamento.text = departamentoFiltro ?: "Departamento"
         currentPage = 1
         aplicarFiltro(immediate = true)
     }
@@ -136,37 +126,110 @@ class BusquedaPacientesController {
     }
 
     private fun aplicarFiltro(immediate: Boolean, firstRender: Boolean = false) {
-        val q = txtBuscar.text?.trim()?.lowercase().orEmpty()
+        val query = txtBuscar.text?.trim().orEmpty()
+        // Si hay texto de búsqueda, se busca en todos los registros.
+        // Si no hay texto, se aplica el rango seleccionado (por defecto: últimos 30 días).
+        val desde = if (query.isBlank()) cutoffDesde(rangoFiltro) else null
+        val requestedPage = currentPage
 
-        val filtrados = pacientes
-            .asSequence()
-            .filter { p ->
-                if (q.isBlank()) true
-                else p.nombre.lowercase().contains(q) || p.pacienteId.lowercase().contains(q) || p.telefono.lowercase().contains(q)
+        fetchJob?.cancel()
+        fetchJob =
+            scope.launch {
+                try {
+                    if (immediate) lblMostrando.text = "Buscando..."
+
+                    val page =
+                        withContext(Dispatchers.IO) {
+                            repo.search(
+                                query = query,
+                                desde = desde,
+                                page = currentPage,
+                                pageSize = pageSize,
+                            )
+                        }
+
+                    val total = page.total
+                    val totalPages = maxOf(1, ((total + pageSize - 1) / pageSize))
+                    currentPage = currentPage.coerceIn(1, totalPages)
+
+                    val finalPage =
+                        if (currentPage != requestedPage) {
+                            withContext(Dispatchers.IO) {
+                                repo.search(
+                                    query = query,
+                                    desde = desde,
+                                    page = currentPage,
+                                    pageSize = pageSize,
+                                )
+                            }
+                        } else {
+                            page
+                        }
+
+                    val rows = finalPage.items.map { toRow(it) }
+
+                    lblMostrando.text = "Mostrando ${finalPage.total} resultados"
+                    lblPagina.text = "Página $currentPage de $totalPages"
+                    renderPagination(totalPages)
+
+                    swapRows(rows, animate = !firstRender)
+                } catch (_: Exception) {
+                    lblMostrando.text = "Error consultando pacientes."
+                    lblPagina.text = "Página 1 de 1"
+                    paginationContainer.children.clear()
+                    swapRows(emptyList(), animate = !firstRender)
+                }
             }
-            .filter { p ->
-                if (estadoFiltro == EstadoFiltro.TODOS) true else p.estado == estadoFiltro
-            }
-            .filter { p ->
-                departamentoFiltro?.let { p.departamento == it } ?: true
-            }
-            // El rango es demo visual (la data no tiene fecha estructurada): se mantiene como selector sin afectar resultados.
-            .toList()
+    }
 
-        val total = filtrados.size
-        val totalPages = maxOf(1, ((total + pageSize - 1) / pageSize))
-        currentPage = currentPage.coerceIn(1, totalPages)
-
-        val pageItems = filtrados.drop((currentPage - 1) * pageSize).take(pageSize)
-        lblMostrando.text = "Mostrando $total resultados"
-        lblPagina.text = "Página $currentPage de $totalPages"
-        renderPagination(totalPages)
-
-        if (firstRender || immediate) {
-            swapRows(pageItems, animate = !firstRender)
-        } else {
-            swapRows(pageItems, animate = true)
+    private fun cutoffDesde(rango: RangoFiltro): LocalDate {
+        val today = LocalDate.now()
+        return when (rango) {
+            RangoFiltro.H24 -> today.minusDays(1)
+            RangoFiltro.D7 -> today.minusDays(7)
+            RangoFiltro.D30 -> today.minusDays(30)
         }
+    }
+
+    private fun toRow(p: Paciente): PacienteRow {
+        val nombre = p.nombre?.trim().orEmpty().ifBlank { "-" }
+        val dpi = p.dpi?.trim().orEmpty().ifBlank { "-" }
+        val sexo = sexoLabel(p.sexo)
+        val edad = edadLabel(p.fechaNacimiento)
+        val telefono = p.telefono?.trim().orEmpty().ifBlank { "-" }
+        val ultima = ultimaVisitaLabel(p.fechaRegistro)
+
+        return PacienteRow(
+            nombre = nombre,
+            pacienteId = dpi,
+            edad = edad,
+            sexo = sexo,
+            telefono = telefono,
+            ultimaVisita = ultima,
+            estado = EstadoFiltro.ACTIVO, // Por ahora: cualquier registro encontrado es "Activo".
+        )
+    }
+
+    private fun edadLabel(fechaNacimiento: LocalDate?): String {
+        val fn = fechaNacimiento ?: return "-"
+        val today = LocalDate.now()
+        if (fn.isAfter(today)) return "-"
+        val years = Period.between(fn, today).years
+        return years.toString()
+    }
+
+    private fun sexoLabel(sexo: String?): String =
+        when (sexo?.trim()?.uppercase()) {
+            "M" -> "Masculino"
+            "F" -> "Femenino"
+            else -> "-"
+        }
+
+    private fun ultimaVisitaLabel(fechaRegistro: LocalDate?): String {
+        val fr = fechaRegistro ?: return "-"
+        val today = LocalDate.now()
+        if (fr == today) return "Hoy"
+        return fmtFecha.format(fr).lowercase(esLocale)
     }
 
     private fun renderPagination(totalPages: Int) {
@@ -299,7 +362,7 @@ class BusquedaPacientesController {
         val demo = VBox(2.0).apply {
             prefWidth = 160.0
             children.addAll(
-                Label("${p.edad} años").apply { styleClass.add("ps-cell-strong") },
+                Label(if (p.edad == "-") "-" else "${p.edad} años").apply { styleClass.add("ps-cell-strong") },
                 Label(p.sexo).apply { styleClass.add("muted") },
             )
         }
@@ -315,8 +378,6 @@ class BusquedaPacientesController {
         val statusChip = Label(p.estado.label).apply {
             styleClass.addAll("ps-status-chip", when (p.estado) {
                 EstadoFiltro.ACTIVO -> "ps-status-chip-tone-ok"
-                EstadoFiltro.OBSERVACION -> "ps-status-chip-tone-warn"
-                EstadoFiltro.EGRESADO -> "ps-status-chip-tone-muted"
                 EstadoFiltro.TODOS -> "ps-status-chip-tone-muted"
             })
         }

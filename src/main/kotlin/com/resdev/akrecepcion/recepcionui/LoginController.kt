@@ -23,9 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.javafx.*
-import com.resdev.akrecepcion.recepcionui.dao.jdbc.UsuarioDaoJdbc
-import com.resdev.akrecepcion.recepcionui.repository.impl.UsuarioRepositoryImpl
-import com.resdev.akrecepcion.recepcionui.service.AuthService
 import com.resdev.akrecepcion.recepcionui.service.LoginResult
 
 class LoginController {
@@ -43,7 +40,7 @@ class LoginController {
     @FXML private lateinit var btnPopupAceptar: Button
 
     private val scope = CoroutineScope(Dispatchers.JavaFx + SupervisorJob())
-    private val authService = AuthService(UsuarioRepositoryImpl(UsuarioDaoJdbc()))
+    private val authService = AppContainer.authService
 
     @FXML
     private fun initialize() {

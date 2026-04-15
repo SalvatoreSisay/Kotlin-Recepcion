@@ -1,5 +1,7 @@
 package com.resdev.akrecepcion.recepcionui
 
+import com.resdev.akrecepcion.recepcionui.dao.PacienteNuevo
+import com.resdev.akrecepcion.recepcionui.dao.jdbc.PacienteDaoJdbc
 import javafx.animation.Interpolator
 import javafx.animation.ParallelTransition
 import javafx.animation.TranslateTransition
@@ -7,6 +9,7 @@ import javafx.fxml.FXML
 import javafx.scene.Node
 import javafx.scene.control.Button
 import javafx.scene.control.ComboBox
+import javafx.scene.control.DatePicker
 import javafx.scene.control.Label
 import javafx.scene.control.TextArea
 import javafx.scene.control.TextField
@@ -16,29 +19,42 @@ import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.shape.Rectangle
 import javafx.util.Duration
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.javafx.JavaFx
+import java.time.LocalDate
+import java.time.Period
 
 class NuevoPacienteController {
     private enum class Paso(val idx: Int) {
         PERSONAL(0),
         UBICACION(1),
-        AREA_MEDICA(2),
-        RESUMEN(3),
+        HOSPITALARIO(2),
+        AREA_MEDICA(3),
+        RESUMEN(4),
     }
 
     @FXML private lateinit var pagesHost: StackPane
     @FXML private lateinit var pagePersonal: VBox
     @FXML private lateinit var pageUbicacion: VBox
+    @FXML private lateinit var pageHospitalario: VBox
     @FXML private lateinit var pageAreaMedica: VBox
     @FXML private lateinit var pageResumen: VBox
 
     @FXML private lateinit var step1Circle: Region
     @FXML private lateinit var step2Circle: Region
     @FXML private lateinit var step3Circle: Region
+    @FXML private lateinit var step4Circle: Region
     @FXML private lateinit var step1Label: Label
     @FXML private lateinit var step2Label: Label
     @FXML private lateinit var step3Label: Label
+    @FXML private lateinit var step4Label: Label
     @FXML private lateinit var stepLine12: Region
     @FXML private lateinit var stepLine23: Region
+    @FXML private lateinit var stepLine34: Region
 
     @FXML private lateinit var btnAnterior: Button
     @FXML private lateinit var btnSiguiente: Button
@@ -48,18 +64,31 @@ class NuevoPacienteController {
 
     // Paso 1
     @FXML private lateinit var txtNombre: TextField
-    @FXML private lateinit var txtApellidos: TextField
+    @FXML private lateinit var dpFechaNacimiento: DatePicker
     @FXML private lateinit var txtEdad: TextField
     @FXML private lateinit var cmbGenero: ComboBox<String>
+    @FXML private lateinit var txtDpi: TextField
+    @FXML private lateinit var txtTelefono: TextField
+    @FXML private lateinit var txtEtnia: TextField
+    @FXML private lateinit var txtEstadoCivil: TextField
+    @FXML private lateinit var txtOcupacion: TextField
 
     // Paso 2
     @FXML private lateinit var txtDireccion: TextField
     @FXML private lateinit var txtCiudad: TextField
     @FXML private lateinit var txtDepartamento: TextField
+    @FXML private lateinit var txtMunicipio: TextField
     @FXML private lateinit var txtPais: TextField
     @FXML private lateinit var txtCodigoPostal: TextField
+    @FXML private lateinit var txtLugarNacimiento: TextField
 
-    // Paso 3
+    // Paso 3 (Hospitalario)
+    @FXML private lateinit var txtPrograma: TextField
+    @FXML private lateinit var txtIgss: TextField
+    @FXML private lateinit var txtPacienteAltoRiesgo: TextField
+    @FXML private lateinit var txtQuienRegistra: TextField
+
+    // Paso 4
     @FXML private lateinit var cmbEspecialidad: ComboBox<String>
     @FXML private lateinit var txtMotivo: TextArea
     @FXML private lateinit var cmbPrioridad: ComboBox<String>
@@ -76,6 +105,10 @@ class NuevoPacienteController {
 
     private var pasoActual: Paso = Paso.PERSONAL
     private var animando = false
+    private var guardando = false
+
+    private val scope = CoroutineScope(Dispatchers.JavaFx + SupervisorJob())
+    private val pacienteDao = PacienteDaoJdbc()
 
     @FXML
     private fun initialize() {
@@ -85,7 +118,7 @@ class NuevoPacienteController {
         clip.heightProperty().bind(pagesHost.heightProperty())
         pagesHost.clip = clip
 
-        cmbGenero.items.setAll("Femenino", "Masculino", "Otro", "Prefiero no decir")
+        cmbGenero.items.setAll("F", "M")
         cmbEspecialidad.items.setAll(
             "Medicina General",
             "Pediatria",
@@ -97,6 +130,25 @@ class NuevoPacienteController {
         )
         cmbPrioridad.items.setAll("Normal", "Alta", "Urgente")
         cmbPrioridad.selectionModel.selectFirst()
+
+        // Quien registra: se llena automáticamente con el usuario logeado.
+        txtQuienRegistra.text = AppSession.currentUser.usuario
+        txtQuienRegistra.isEditable = false
+        txtQuienRegistra.isFocusTraversable = false
+
+        txtEdad.isEditable = false
+        txtEdad.isFocusTraversable = false
+
+        dpFechaNacimiento.valueProperty().addListener { _, _, newValue ->
+            updateEdadFromFecha(newValue)
+        }
+
+        // DPI: máximo 15 caracteres (la columna es varchar(15)).
+        txtDpi.textProperty().addListener { _, _, newValue ->
+            if (newValue != null && newValue.length > 15) {
+                txtDpi.text = newValue.take(15)
+            }
+        }
 
         // Estado inicial.
         lblWizardStatus.text = ""
@@ -119,11 +171,13 @@ class NuevoPacienteController {
 
     private fun goPrev() {
         if (animando) return
+        if (guardando) return
         lblWizardStatus.text = ""
         val next = when (pasoActual) {
             Paso.PERSONAL -> Paso.PERSONAL
             Paso.UBICACION -> Paso.PERSONAL
-            Paso.AREA_MEDICA -> Paso.UBICACION
+            Paso.HOSPITALARIO -> Paso.UBICACION
+            Paso.AREA_MEDICA -> Paso.HOSPITALARIO
             Paso.RESUMEN -> Paso.AREA_MEDICA
         }
         if (next == pasoActual) return
@@ -132,6 +186,7 @@ class NuevoPacienteController {
 
     private fun goNext() {
         if (animando) return
+        if (guardando) return
         lblWizardStatus.text = ""
 
         if (!validarPaso(pasoActual)) {
@@ -145,7 +200,8 @@ class NuevoPacienteController {
 
         val next = when (pasoActual) {
             Paso.PERSONAL -> Paso.UBICACION
-            Paso.UBICACION -> Paso.AREA_MEDICA
+            Paso.UBICACION -> Paso.HOSPITALARIO
+            Paso.HOSPITALARIO -> Paso.AREA_MEDICA
             Paso.AREA_MEDICA -> Paso.RESUMEN
             Paso.RESUMEN -> Paso.RESUMEN
         }
@@ -161,6 +217,13 @@ class NuevoPacienteController {
             return ok
         }
 
+        fun reqDate(control: DatePicker): Boolean {
+            val d = control.value
+            val ok = d != null && !d.isAfter(LocalDate.now())
+            setError(control, !ok)
+            return ok
+        }
+
         fun reqCombo(control: ComboBox<*>): Boolean {
             val ok = control.value != null
             setError(control, !ok)
@@ -170,18 +233,19 @@ class NuevoPacienteController {
         return when (paso) {
             Paso.PERSONAL -> {
                 val okNombre = req(txtNombre)
-                val okApellidos = req(txtApellidos)
-                val okEdad = req(txtEdad)
+                val okFecha = reqDate(dpFechaNacimiento)
                 val okGenero = reqCombo(cmbGenero)
-                okNombre && okApellidos && okEdad && okGenero
+                okNombre && okFecha && okGenero
             }
             Paso.UBICACION -> {
                 val okDireccion = req(txtDireccion)
                 val okCiudad = req(txtCiudad)
                 val okDepartamento = req(txtDepartamento)
+                val okMunicipio = req(txtMunicipio)
                 val okPais = req(txtPais)
-                okDireccion && okCiudad && okDepartamento && okPais
+                okDireccion && okCiudad && okDepartamento && okMunicipio && okPais
             }
+            Paso.HOSPITALARIO -> true
             Paso.AREA_MEDICA -> {
                 val okEspecialidad = reqCombo(cmbEspecialidad)
                 val okMotivo = req(txtMotivo)
@@ -189,6 +253,25 @@ class NuevoPacienteController {
             }
             Paso.RESUMEN -> true
         }
+    }
+
+    private fun updateEdadFromFecha(fecha: LocalDate?) {
+        if (fecha == null) {
+            txtEdad.text = ""
+            setError(dpFechaNacimiento, false)
+            return
+        }
+
+        val hoy = LocalDate.now()
+        if (fecha.isAfter(hoy)) {
+            txtEdad.text = ""
+            setError(dpFechaNacimiento, true)
+            return
+        }
+
+        val years = Period.between(fecha, hoy).years
+        txtEdad.text = years.toString()
+        setError(dpFechaNacimiento, false)
     }
 
     private fun setError(node: Node, error: Boolean) {
@@ -238,15 +321,17 @@ class NuevoPacienteController {
         }
     }
 
-    private fun nodeFor(paso: Paso): VBox = when (paso) {
-        Paso.PERSONAL -> pagePersonal
-        Paso.UBICACION -> pageUbicacion
-        Paso.AREA_MEDICA -> pageAreaMedica
-        Paso.RESUMEN -> pageResumen
-    }
+    private fun nodeFor(paso: Paso): VBox =
+        when (paso) {
+            Paso.PERSONAL -> pagePersonal
+            Paso.UBICACION -> pageUbicacion
+            Paso.HOSPITALARIO -> pageHospitalario
+            Paso.AREA_MEDICA -> pageAreaMedica
+            Paso.RESUMEN -> pageResumen
+        }
 
     private fun showOnly(node: VBox) {
-        listOf(pagePersonal, pageUbicacion, pageAreaMedica, pageResumen).forEach {
+        listOf(pagePersonal, pageUbicacion, pageHospitalario, pageAreaMedica, pageResumen).forEach {
             it.isVisible = it === node
             it.isManaged = it === node
             it.translateX = 0.0
@@ -269,9 +354,9 @@ class NuevoPacienteController {
 
     private fun updateStepUI() {
         // Reset
-        val circles = listOf(step1Circle, step2Circle, step3Circle)
-        val labels = listOf(step1Label, step2Label, step3Label)
-        val lines = listOf(stepLine12, stepLine23)
+        val circles = listOf(step1Circle, step2Circle, step3Circle, step4Circle)
+        val labels = listOf(step1Label, step2Label, step3Label, step4Label)
+        val lines = listOf(stepLine12, stepLine23, stepLine34)
         circles.forEach {
             it.styleClass.remove("wizard-step-circle-state-active")
             it.styleClass.remove("wizard-step-circle-state-done")
@@ -309,7 +394,7 @@ class NuevoPacienteController {
                 stepLine12.styleClass.add("wizard-step-line-state-done")
                 setActive(step2Circle, step2Label)
             }
-            Paso.AREA_MEDICA -> {
+            Paso.HOSPITALARIO -> {
                 setDone(step1Circle, step1Label)
                 setDone(step2Circle, step2Label)
                 stepLine12.styleClass.remove("wizard-step-line-state-idle")
@@ -317,6 +402,18 @@ class NuevoPacienteController {
                 stepLine23.styleClass.remove("wizard-step-line-state-idle")
                 stepLine23.styleClass.add("wizard-step-line-state-done")
                 setActive(step3Circle, step3Label)
+            }
+            Paso.AREA_MEDICA -> {
+                setDone(step1Circle, step1Label)
+                setDone(step2Circle, step2Label)
+                setDone(step3Circle, step3Label)
+                stepLine12.styleClass.remove("wizard-step-line-state-idle")
+                stepLine12.styleClass.add("wizard-step-line-state-done")
+                stepLine23.styleClass.remove("wizard-step-line-state-idle")
+                stepLine23.styleClass.add("wizard-step-line-state-done")
+                stepLine34.styleClass.remove("wizard-step-line-state-idle")
+                stepLine34.styleClass.add("wizard-step-line-state-done")
+                setActive(step4Circle, step4Label)
             }
             Paso.RESUMEN -> {
                 setDone(step1Circle, step1Label)
@@ -325,22 +422,25 @@ class NuevoPacienteController {
                 stepLine12.styleClass.add("wizard-step-line-state-done")
                 stepLine23.styleClass.remove("wizard-step-line-state-idle")
                 stepLine23.styleClass.add("wizard-step-line-state-done")
+                setDone(step3Circle, step3Label)
+                stepLine34.styleClass.remove("wizard-step-line-state-idle")
+                stepLine34.styleClass.add("wizard-step-line-state-done")
                 // Mantenemos el último paso como "activo" para el cierre del flujo.
-                setActive(step3Circle, step3Label)
+                setActive(step4Circle, step4Label)
             }
         }
     }
 
     private fun renderResumen() {
-        val nombre = "${txtNombre.text.orEmpty().trim()} ${txtApellidos.text.orEmpty().trim()}".trim().ifEmpty { "-" }
+        val nombre = txtNombre.text.orEmpty().trim().ifEmpty { "-" }
         val edad = txtEdad.text.orEmpty().trim().ifEmpty { "-" }
         val genero = (cmbGenero.value ?: "-").trim().ifEmpty { "-" }
 
         val direccion = txtDireccion.text.orEmpty().trim().ifEmpty { "-" }
-        val ciudad = txtCiudad.text.orEmpty().trim().ifEmpty { "-" }
-        val depto = txtDepartamento.text.orEmpty().trim().ifEmpty { "-" }
+        val canton = txtCiudad.text.orEmpty().trim().ifEmpty { "-" }
+        val municipio = txtMunicipio.text.orEmpty().trim().ifEmpty { "-" }
         val pais = txtPais.text.orEmpty().trim().ifEmpty { "-" }
-        val postal = txtCodigoPostal.text.orEmpty().trim().ifEmpty { "-" }
+        val direccionAviso = txtCodigoPostal.text.orEmpty().trim().ifEmpty { "-" }
 
         val esp = (cmbEspecialidad.value ?: "-").trim().ifEmpty { "-" }
         val prioridad = (cmbPrioridad.value ?: "Normal").trim().ifEmpty { "Normal" }
@@ -349,8 +449,8 @@ class NuevoPacienteController {
         lblResumenNombre.text = nombre
         lblResumenEdadGenero.text = "$edad años · $genero"
         lblResumenDireccion.text = direccion
-        lblResumenCiudadDepto.text = "$ciudad · $depto"
-        lblResumenPaisPostal.text = "$pais · $postal"
+        lblResumenCiudadDepto.text = "$canton · $municipio"
+        lblResumenPaisPostal.text = "$pais · $direccionAviso"
         lblResumenEspecialidad.text = esp
         lblResumenPrioridadChip.text = prioridad.uppercase()
         lblResumenMotivo.text = motivo
@@ -366,17 +466,89 @@ class NuevoPacienteController {
 
     @FXML
     private fun onConfirmarRegistro(@Suppress("UNUSED_PARAMETER") event: javafx.event.ActionEvent) {
-        lblWizardStatus.text = "Registro confirmado. Expediente creado (demo)."
-        lblWizardStatus.styleClass.remove("wizard-status-tone-error")
-        if (!lblWizardStatus.styleClass.contains("wizard-status-tone-ok")) {
-            lblWizardStatus.styleClass.add("wizard-status-tone-ok")
+        if (animando || guardando) return
+
+        // Redundante: al llegar al resumen ya se validó, pero aquí volvemos a validar para evitar inserts incompletos.
+        val ok =
+            validarPaso(Paso.PERSONAL) &&
+                validarPaso(Paso.UBICACION) &&
+                validarPaso(Paso.HOSPITALARIO) &&
+                validarPaso(Paso.AREA_MEDICA)
+        if (!ok) {
+            lblWizardStatus.text = "Hay campos obligatorios incompletos. Revisa los pasos anteriores."
+            lblWizardStatus.styleClass.remove("wizard-status-tone-ok")
+            if (!lblWizardStatus.styleClass.contains("wizard-status-tone-error")) {
+                lblWizardStatus.styleClass.add("wizard-status-tone-error")
+            }
+            return
         }
 
-        limpiarFormulario()
-        showOnly(pagePersonal)
-        pasoActual = Paso.PERSONAL
-        updateStepUI()
-        updateButtons()
+        val payload =
+            PacienteNuevo(
+                nombre = txtNombre.text.trim(),
+                fechaNacimiento = requireNotNull(dpFechaNacimiento.value) { "Fecha de nacimiento requerida" },
+                sexo = (cmbGenero.value ?: "").trim(),
+                dpi = txtDpi.text?.trim().orEmpty(),
+                telefono = txtTelefono.text?.trim().orEmpty(),
+                etnia = txtEtnia.text?.trim().orEmpty(),
+                estadoCivil = txtEstadoCivil.text?.trim().orEmpty(),
+                ocupacion = txtOcupacion.text?.trim().orEmpty(),
+                direccion = txtDireccion.text.trim(),
+                pais = txtPais.text.trim(),
+                departamento = txtDepartamento.text?.trim().orEmpty(),
+                municipio = txtMunicipio.text.trim(),
+                canton = txtCiudad.text.trim(),
+                direccionAviso = txtCodigoPostal.text?.trim().orEmpty(),
+                lugarNacimiento = txtLugarNacimiento.text?.trim().orEmpty(),
+                programa = txtPrograma.text?.trim().orEmpty(),
+                igss = txtIgss.text?.trim().orEmpty(),
+                pacienteAltoRiesgo = txtPacienteAltoRiesgo.text?.trim().orEmpty(),
+                observaciones = (cmbEspecialidad.value ?: "").trim(),
+                observa1 = (cmbPrioridad.value ?: "Normal").trim(),
+                observa2 = txtMotivo.text?.trim().orEmpty(),
+            )
+
+        setGuardando(true)
+        lblWizardStatus.text = "Guardando paciente..."
+        lblWizardStatus.styleClass.remove("wizard-status-tone-error")
+        lblWizardStatus.styleClass.remove("wizard-status-tone-ok")
+
+        scope.launch {
+            val res =
+                withContext(Dispatchers.IO) {
+                    runCatching {
+                        pacienteDao.insert(
+                            paciente = payload,
+                            quienRegistra = AppSession.currentUser.usuario,
+                        )
+                    }
+                }
+
+            res.fold(
+                onSuccess = { nuevoId ->
+                    lblWizardStatus.text = "Registro creado correctamente. ID: $nuevoId"
+                    lblWizardStatus.styleClass.remove("wizard-status-tone-error")
+                    if (!lblWizardStatus.styleClass.contains("wizard-status-tone-ok")) {
+                        lblWizardStatus.styleClass.add("wizard-status-tone-ok")
+                    }
+
+                    limpiarFormulario()
+                    showOnly(pagePersonal)
+                    pasoActual = Paso.PERSONAL
+                    updateStepUI()
+                    updateButtons()
+                },
+                onFailure = { err ->
+                    lblWizardStatus.text = "Error al registrar: ${err.message ?: err::class.simpleName}"
+                    lblWizardStatus.styleClass.remove("wizard-status-tone-ok")
+                    if (!lblWizardStatus.styleClass.contains("wizard-status-tone-error")) {
+                        lblWizardStatus.styleClass.add("wizard-status-tone-error")
+                    }
+                },
+            )
+
+            setGuardando(false)
+        }
     }
 
     @FXML
@@ -396,18 +568,39 @@ class NuevoPacienteController {
 
     private fun limpiarFormulario() {
         txtNombre.clear()
-        txtApellidos.clear()
+        dpFechaNacimiento.value = null
         txtEdad.clear()
         cmbGenero.selectionModel.clearSelection()
+        txtDpi.clear()
+        txtTelefono.clear()
+        txtEtnia.clear()
+        txtEstadoCivil.clear()
+        txtOcupacion.clear()
 
         txtDireccion.clear()
         txtCiudad.clear()
         txtDepartamento.clear()
+        txtMunicipio.clear()
         txtPais.clear()
         txtCodigoPostal.clear()
+        txtLugarNacimiento.clear()
+
+        txtPrograma.clear()
+        txtIgss.clear()
+        txtPacienteAltoRiesgo.clear()
+        // Se mantiene autollenado para cada registro.
+        txtQuienRegistra.text = AppSession.currentUser.usuario
 
         cmbEspecialidad.selectionModel.clearSelection()
         cmbPrioridad.selectionModel.selectFirst()
         txtMotivo.clear()
+    }
+
+    private fun setGuardando(value: Boolean) {
+        guardando = value
+        pagesHost.isDisable = value
+        btnAnterior.isDisable = value || pasoActual == Paso.PERSONAL
+        btnSiguiente.isDisable = value
+        btnGuardarBorrador.isDisable = value
     }
 }

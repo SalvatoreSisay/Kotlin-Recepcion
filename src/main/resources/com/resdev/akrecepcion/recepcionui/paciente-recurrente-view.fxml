@@ -33,7 +33,7 @@
 
             <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="rp-search-row">
                 <TextField fx:id="txtBuscar"
-                           promptText="Buscar por Nombre, ID o Fecha de nacimiento..."
+                           promptText="Buscar por Nombre, DPI o Código..."
                            styleClass="rp-search-field"/>
                 <Button fx:id="btnBuscar" text="Buscar" styleClass="rp-button-fill-primary"/>
             </HBox>

@@ -1,5 +1,10 @@
 package com.resdev.akrecepcion.recepcionui
 
+import com.resdev.akrecepcion.recepcionui.dao.jdbc.ConsultaExternaDaoJdbc
+import com.resdev.akrecepcion.recepcionui.dao.jdbc.PacienteRecurrenteDaoJdbc
+import com.resdev.akrecepcion.recepcionui.repository.PacienteRecurrenteCard
+import com.resdev.akrecepcion.recepcionui.repository.PacienteRecurrenteRepository
+import com.resdev.akrecepcion.recepcionui.repository.impl.PacienteRecurrenteRepositoryImpl
 import javafx.fxml.FXML
 import javafx.geometry.Insets
 import javafx.scene.Node
@@ -13,6 +18,16 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.Region
 import javafx.scene.layout.VBox
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.javafx.JavaFx
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class PacienteRecurrenteController {
     var onEditarPaciente: ((pacienteId: String) -> Unit)? = null
@@ -39,8 +54,21 @@ class PacienteRecurrenteController {
     @FXML private lateinit var lblNotaRapida: Label
     @FXML private lateinit var btnAgregarNota: Button
 
-    private var filtrados: List<PacienteRecurrenteStore.PacienteRecord> = PacienteRecurrenteStore.all()
-    private var seleccionado: PacienteRecurrenteStore.PacienteRecord? = null
+    private val repo: PacienteRecurrenteRepository =
+        PacienteRecurrenteRepositoryImpl(
+            pacienteDao = PacienteRecurrenteDaoJdbc(),
+            consultaDao = ConsultaExternaDaoJdbc(),
+        )
+
+    private val scope = CoroutineScope(Dispatchers.JavaFx + SupervisorJob())
+    private var fetchJob: Job? = null
+
+    private val esLocale = Locale("es", "GT")
+    private val fmtVisit = DateTimeFormatter.ofPattern("dd MMM, yyyy", esLocale)
+    private val fmtNac = DateTimeFormatter.ofPattern("dd/MM/yyyy", esLocale)
+
+    private var filtrados: List<PacienteRecurrenteCard> = emptyList()
+    private var seleccionado: PacienteRecurrenteCard? = null
     private var selectedCard: Node? = null
 
     @FXML
@@ -59,8 +87,17 @@ class PacienteRecurrenteController {
         btnImprimir.setOnAction { accion("Imprimir ficha") }
         btnHistorial.setOnAction { accion("Ver historial") }
 
-        renderCards(PacienteRecurrenteStore.all())
-        PacienteRecurrenteStore.all().firstOrNull()?.let { seleccionar(it) } ?: limpiarSeleccion()
+        onViewShown()
+    }
+
+    /**
+     * Se llama al entrar a la vista: carga los últimos 3 registrados.
+     * No hay polling; solo se vuelve a cargar al re-entrar o al usar búsqueda explícita.
+     */
+    fun onViewShown() {
+        txtBuscar.clear()
+        lblAccionEstado.text = ""
+        loadLatest()
     }
 
     /**
@@ -78,7 +115,7 @@ class PacienteRecurrenteController {
             if (filtrados.isEmpty()) return
 
             val preferred =
-                if (preferExactId) filtrados.firstOrNull { it.pacienteId.equals(id, ignoreCase = true) }
+                if (preferExactId) filtrados.firstOrNull { it.dpi.equals(id, ignoreCase = true) || it.codigoUsuario.toString() == id }
                 else filtrados.firstOrNull { it.nombre.equals(n, ignoreCase = true) }
             if (preferred != null) seleccionar(preferred)
         }
@@ -97,29 +134,64 @@ class PacienteRecurrenteController {
     }
 
     fun refresh() {
-        // Re-render según el query actual, pero leyendo datos desde el store (por ejemplo, luego de editar).
-        val keepId = seleccionado?.pacienteId
+        // Re-render según el query actual (si hay).
+        val keep = seleccionado?.codigoUsuario
         aplicarFiltro()
-        if (!keepId.isNullOrBlank()) {
-            filtrados.firstOrNull { it.pacienteId.equals(keepId, ignoreCase = true) }?.let { seleccionar(it) }
+        if (keep != null) {
+            filtrados.firstOrNull { it.codigoUsuario == keep }?.let { seleccionar(it) }
         }
     }
 
     private fun aplicarFiltro() {
-        val q = txtBuscar.text?.trim()?.lowercase().orEmpty()
-        filtrados =
-            if (q.isBlank()) PacienteRecurrenteStore.all()
-            else PacienteRecurrenteStore.all().filter {
-                it.nombre.lowercase().contains(q) ||
-                    it.pacienteId.lowercase().contains(q) ||
-                    it.fechaNacimiento.lowercase().contains(q)
-            }
-
-        renderCards(filtrados)
-        if (filtrados.isNotEmpty()) seleccionar(filtrados.first()) else limpiarSeleccion()
+        val q = txtBuscar.text?.trim().orEmpty()
+        if (q.isBlank()) {
+            loadLatest()
+        } else {
+            search(q)
+        }
     }
 
-    private fun renderCards(items: List<PacienteRecurrenteStore.PacienteRecord>) {
+    private fun loadLatest() {
+        fetchJob?.cancel()
+        fetchJob =
+            scope.launch {
+                try {
+                    val items =
+                        withContext(Dispatchers.IO) {
+                            repo.latestCards(limit = 3)
+                        }
+                    applyResults(items)
+                } catch (e: Exception) {
+                    lblAccionEstado.text = "Error consultando pacientes: ${e.message ?: e::class.simpleName}"
+                    applyResults(emptyList())
+                }
+            }
+    }
+
+    private fun search(q: String) {
+        fetchJob?.cancel()
+        fetchJob =
+            scope.launch {
+                try {
+                    val items =
+                        withContext(Dispatchers.IO) {
+                            repo.searchCards(query = q, limit = 3)
+                        }
+                    applyResults(items)
+                } catch (e: Exception) {
+                    lblAccionEstado.text = "Error consultando pacientes: ${e.message ?: e::class.simpleName}"
+                    applyResults(emptyList())
+                }
+            }
+    }
+
+    private fun applyResults(items: List<PacienteRecurrenteCard>) {
+        filtrados = items
+        renderCards(items)
+        if (items.isNotEmpty()) seleccionar(items.first()) else limpiarSeleccion()
+    }
+
+    private fun renderCards(items: List<PacienteRecurrenteCard>) {
         resultsContainer.children.clear()
         lblEncontrados.text = "Se encontraron ${items.size} registros"
 
@@ -128,7 +200,7 @@ class PacienteRecurrenteController {
         }
     }
 
-    private fun createPacienteCard(p: PacienteRecurrenteStore.PacienteRecord): VBox {
+    private fun createPacienteCard(p: PacienteRecurrenteCard): VBox {
         val avatar = Region().apply {
             styleClass.add("rp-avatar-shape")
             minWidth = 46.0
@@ -138,15 +210,15 @@ class PacienteRecurrenteController {
         }
 
         val title = Label(p.nombre).apply { styleClass.add("rp-card-title-text-state-primary") }
-        val subtitle = Label("ID Paciente: ${p.pacienteId}").apply { styleClass.add("muted") }
+        val subtitle = Label("DPI: ${p.dpi.ifBlank { "-" }}").apply { styleClass.add("muted") }
 
-        val lastVisit = Label("ULTIMA VEZ QUE VINO\n${p.ultimaVisita}").apply { styleClass.add("rp-card-meta-text-state-primary") }
+        val lastVisit = Label("ULTIMA VEZ QUE VINO\n${ultimaVisitaLabel(p.fechaRegistro)}").apply { styleClass.add("rp-card-meta-text-state-primary") }
 
         val btnEditar = Button("Editar").apply {
             styleClass.add("rpe-card-edit-button")
             setOnAction {
                 seleccionar(p)
-                onEditarPaciente?.invoke(p.pacienteId)
+                lblAccionEstado.text = "Edición pendiente para registros reales."
             }
         }
 
@@ -175,25 +247,25 @@ class PacienteRecurrenteController {
 
         val chips = HBox(10.0).apply {
             children.addAll(
-                chip("NACIMIENTO", p.fechaNacimiento),
-                chip("SANGRE", p.tipoSangre),
-                chip("SEGURO", p.seguro),
+                chip("NACIMIENTO", nacimientoLabel(p.fechaNacimiento)),
+                chip("IMC", imcLabel(p.imc)),
+                chip("PROGRAMA", p.programa?.trim().orEmpty().ifBlank { "-" }),
             )
         }
 
         val leftList = VBox(6.0).apply {
             children.add(Label("RESUMEN CLINICO").apply { styleClass.add("rp-subtitle-text-state-accent") })
             children.addAll(
-                p.condicionesCronicas.take(3).map { Label("• $it").apply { styleClass.add("rp-list-text-state-primary") } },
+                resumenClinicoLines(p.historiaEnfermedad).map { Label("• $it").apply { styleClass.add("rp-list-text-state-primary") } },
             )
         }
 
         val rightList = VBox(6.0).apply {
             children.add(Label("CONTACTO PRINCIPAL").apply { styleClass.add("rp-subtitle-text-state-accent") })
             children.addAll(
-                Label(p.telefono).apply { styleClass.add("rp-list-text-state-primary") },
-                Label(p.email).apply { styleClass.add("rp-list-text-state-primary") },
-                Label(p.direccion).apply { styleClass.add("rp-list-text-state-primary") },
+                Label(p.telefono?.trim().orEmpty().ifBlank { "-" }).apply { styleClass.add("rp-list-text-state-primary") },
+                Label(p.email?.trim().orEmpty().ifBlank { "-" }).apply { styleClass.add("rp-list-text-state-primary") },
+                Label(p.direccion?.trim().orEmpty().ifBlank { "-" }).apply { styleClass.add("rp-list-text-state-primary") },
             )
         }
 
@@ -214,22 +286,29 @@ class PacienteRecurrenteController {
         return card
     }
 
-    private fun seleccionar(p: PacienteRecurrenteStore.PacienteRecord) {
+    private fun seleccionar(p: PacienteRecurrenteCard) {
         seleccionado = p
-        chipIdentidad.text = if (p.identidadVerificada) "IDENTIDAD VERIFICADA" else "IDENTIDAD PENDIENTE"
+        val verificada = p.dpi.isNotBlank()
+        chipIdentidad.text = if (verificada) "REGISTRADO" else "DPI PENDIENTE"
         chipIdentidad.styleClass.remove("rp-chip-identity-tone-ok")
         chipIdentidad.styleClass.remove("rp-chip-identity-tone-warn")
-        chipIdentidad.styleClass.add(if (p.identidadVerificada) "rp-chip-identity-tone-ok" else "rp-chip-identity-tone-warn")
+        chipIdentidad.styleClass.add(if (verificada) "rp-chip-identity-tone-ok" else "rp-chip-identity-tone-warn")
 
         lblPacienteSelNombre.text = p.nombre
-        lblPacienteSelId.text = "ID Paciente: ${p.pacienteId}"
+        lblPacienteSelId.text =
+            buildString {
+                append("DPI: ")
+                append(p.dpi.ifBlank { "-" })
+                append(" · Código: ")
+                append(p.codigoUsuario)
+            }
         lblAccionEstado.text = ""
-        lblNotaRapida.text = p.notaRapida
+        lblNotaRapida.text = "No hay notas."
         setAccionesEnabled(true)
 
         // resaltar card seleccionada
         selectedCard?.styleClass?.remove("rp-patient-card-state-selected")
-        val newSelected = resultsContainer.children.firstOrNull { (it.userData as? PacienteRecurrenteStore.PacienteRecord) == p }
+        val newSelected = resultsContainer.children.firstOrNull { (it.userData as? PacienteRecurrenteCard) == p }
         newSelected?.styleClass?.add("rp-patient-card-state-selected")
         selectedCard = newSelected
     }
@@ -247,17 +326,17 @@ class PacienteRecurrenteController {
     private fun mostrarMensajeContinuar() {
         val p = seleccionado ?: return
         val paso = if (radioAgendar.isSelected) "Agendar cita" else "Ya tiene cita"
-        lblNotaRapida.text = "Accion: $paso para ${p.nombre} (demo)."
+        lblNotaRapida.text = "Accion: $paso para ${p.nombre}."
     }
 
     private fun agregarNotaDemo() {
         val p = seleccionado ?: return
-        lblNotaRapida.text = "Nota agregada para ${p.nombre} (demo)."
+        lblNotaRapida.text = "Notas de recepción pendientes de implementar."
     }
 
     private fun accion(nombreAccion: String) {
         val p = seleccionado ?: return
-        lblAccionEstado.text = "$nombreAccion: ${p.nombre} (demo)."
+        lblAccionEstado.text = "$nombreAccion: ${p.nombre}."
     }
 
     private fun setAccionesEnabled(enabled: Boolean) {
@@ -269,5 +348,31 @@ class PacienteRecurrenteController {
         btnAgregarNota.isDisable = !enabled
         radioAgendar.isDisable = !enabled
         radioYaTiene.isDisable = !enabled
+    }
+
+    private fun ultimaVisitaLabel(fechaRegistro: LocalDate?): String {
+        val fr = fechaRegistro ?: return "-"
+        val today = LocalDate.now()
+        if (fr == today) return "Hoy"
+        return fmtVisit.format(fr).lowercase(esLocale)
+    }
+
+    private fun nacimientoLabel(fn: LocalDate?): String =
+        fn?.let { fmtNac.format(it) } ?: "-"
+
+    private fun imcLabel(imc: Int?): String =
+        imc?.toString() ?: "-"
+
+    private fun resumenClinicoLines(historia: String?): List<String> {
+        val raw = historia?.trim().orEmpty()
+        if (raw.isBlank()) return listOf("Sin resumen clínico")
+
+        // Divide de manera tolerante: líneas, punto y coma o punto.
+        val parts =
+            raw.split("\n", ";", ".")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+
+        return (if (parts.isEmpty()) listOf(raw) else parts).take(3)
     }
 }

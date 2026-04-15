@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
@@ -37,11 +38,11 @@
     </VBox>
 
     <VBox spacing="10.0" styleClass="wizard-steps-container">
-        <HBox spacing="14.0" alignment="CENTER_LEFT" styleClass="wizard-steps-row">
-            <HBox spacing="10.0" alignment="CENTER_LEFT">
-                <Region fx:id="step1Circle">
-                    <styleClass>
-                        <String fx:value="wizard-step-circle"/>
+            <HBox spacing="14.0" alignment="CENTER_LEFT" styleClass="wizard-steps-row">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Region fx:id="step1Circle">
+                        <styleClass>
+                            <String fx:value="wizard-step-circle"/>
                         <String fx:value="wizard-step-circle-state-active"/>
                     </styleClass>
                 </Region>
@@ -85,7 +86,27 @@
                         <String fx:value="wizard-step-circle-state-idle"/>
                     </styleClass>
                 </Region>
-                <Label fx:id="step3Label" text="3. AREA MEDICA">
+                <Label fx:id="step3Label" text="3. INFORMACION HOSPITALARIO">
+                    <styleClass>
+                        <String fx:value="wizard-step-text"/>
+                        <String fx:value="wizard-step-text-state-idle"/>
+                    </styleClass>
+                </Label>
+            </HBox>
+            <Region fx:id="stepLine34" HBox.hgrow="ALWAYS">
+                <styleClass>
+                    <String fx:value="wizard-step-line"/>
+                    <String fx:value="wizard-step-line-state-idle"/>
+                </styleClass>
+            </Region>
+            <HBox spacing="10.0" alignment="CENTER_LEFT">
+                <Region fx:id="step4Circle">
+                    <styleClass>
+                        <String fx:value="wizard-step-circle"/>
+                        <String fx:value="wizard-step-circle-state-idle"/>
+                    </styleClass>
+                </Region>
+                <Label fx:id="step4Label" text="4. AREA MEDICA">
                     <styleClass>
                         <String fx:value="wizard-step-text"/>
                         <String fx:value="wizard-step-text-state-idle"/>
@@ -128,17 +149,41 @@
                         <TextField fx:id="txtNombre" promptText="ej. Alexander" styleClass="wizard-field"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="APELLIDOS *" styleClass="wizard-field-label"/>
-                        <TextField fx:id="txtApellidos" promptText="ej. Thompson" styleClass="wizard-field"/>
+                        <Label text="FECHA DE NACIMIENTO *" styleClass="wizard-field-label"/>
+                        <DatePicker fx:id="dpFechaNacimiento" promptText="Selecciona una fecha" styleClass="wizard-field"/>
                     </VBox>
 
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                        <Label text="EDAD *" styleClass="wizard-field-label"/>
-                        <TextField fx:id="txtEdad" promptText="ej. 28" styleClass="wizard-field"/>
+                        <Label text="EDAD" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtEdad" editable="false" promptText="Se calcula automáticamente" styleClass="wizard-field"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <Label text="GENERO *" styleClass="wizard-field-label"/>
-                        <ComboBox fx:id="cmbGenero" promptText="Selecciona genero" styleClass="wizard-field"/>
+                        <Label text="SEXO *" styleClass="wizard-field-label"/>
+                        <ComboBox fx:id="cmbGenero" promptText="Selecciona sexo" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                        <Label text="DPI" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtDpi" promptText="13-15 dígitos" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="TELEFONO" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtTelefono" promptText="ej. +502 5555 5555" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                        <Label text="ETNIA" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtEtnia" promptText="ej. Maya" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Label text="ESTADO CIVIL" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtEstadoCivil" promptText="ej. Soltero/a" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2">
+                        <Label text="OCUPACION" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtOcupacion" promptText="ej. Comerciante" styleClass="wizard-field"/>
                     </VBox>
                 </GridPane>
             </VBox>
@@ -157,22 +202,60 @@
                         <TextField fx:id="txtDireccion" promptText="Calle, numero, colonia" styleClass="wizard-field"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                        <Label text="CIUDAD / MUNICIPIO *" styleClass="wizard-field-label"/>
-                        <TextField fx:id="txtCiudad" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                        <Label text="CANTON *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtCiudad" promptText="ej. Panajachel" styleClass="wizard-field"/>
                     </VBox>
 
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                        <Label text="DEPARTAMENTO / ESTADO *" styleClass="wizard-field-label"/>
-                        <TextField fx:id="txtDepartamento" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                        <Label text="DEPARTAMENTO *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtDepartamento" promptText="ej. Sololá" styleClass="wizard-field"/>
                     </VBox>
                     <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                        <Label text="PAIS *" styleClass="wizard-field-label"/>
-                        <TextField fx:id="txtPais" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                        <Label text="MUNICIPIO *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtMunicipio" promptText="ej. Panajachel" styleClass="wizard-field"/>
                     </VBox>
 
                     <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                        <Label text="CODIGO POSTAL" styleClass="wizard-field-label"/>
-                        <TextField fx:id="txtCodigoPostal" promptText="ej. 01001" styleClass="wizard-field"/>
+                        <Label text="PAIS *" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtPais" promptText="ej. Guatemala" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                        <Label text="LUGAR DE NACIMIENTO" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtLugarNacimiento" promptText="Opcional" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2">
+                        <Label text="DIRECCION A AVISAR" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtCodigoPostal" promptText="Contacto/dirección para avisar" styleClass="wizard-field"/>
+                    </VBox>
+                </GridPane>
+            </VBox>
+
+            <VBox fx:id="pageHospitalario" spacing="12.0" visible="false" managed="false">
+                <Label text="Informacion hospitalario" styleClass="section-title"/>
+
+                <GridPane hgap="12.0" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                    </columnConstraints>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                        <Label text="PROGRAMA" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtPrograma" promptText="Opcional" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                        <Label text="IGSS" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtIgss" promptText="Opcional" styleClass="wizard-field"/>
+                    </VBox>
+
+                    <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                        <Label text="PACIENTE DE ALTO RIESGO" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtPacienteAltoRiesgo" promptText="Opcional" styleClass="wizard-field"/>
+                    </VBox>
+                    <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                        <Label text="USUARIO QUIEN REGISTRA" styleClass="wizard-field-label"/>
+                        <TextField fx:id="txtQuienRegistra" editable="false" styleClass="wizard-field"/>
                     </VBox>
                 </GridPane>
             </VBox>
@@ -235,11 +318,11 @@
                                 </columnConstraints>
 
                                 <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <Label text="NOMBRE COMPLETO" styleClass="wizard-field-label"/>
+                                    <Label text="NOMBRE" styleClass="wizard-field-label"/>
                                     <Label fx:id="lblResumenNombre" text="-" styleClass="summary-value"/>
                                 </VBox>
                                 <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <Label text="EDAD / GÉNERO" styleClass="wizard-field-label"/>
+                                    <Label text="EDAD / SEXO" styleClass="wizard-field-label"/>
                                     <Label fx:id="lblResumenEdadGenero" text="-" styleClass="summary-value"/>
                                 </VBox>
 
@@ -259,11 +342,11 @@
 
                                 <VBox spacing="8.0">
                                     <VBox spacing="4.0">
-                                        <Label text="CIUDAD / DEPARTAMENTO" styleClass="wizard-field-label"/>
+                                        <Label text="CANTON / MUNICIPIO" styleClass="wizard-field-label"/>
                                         <Label fx:id="lblResumenCiudadDepto" text="-" styleClass="summary-value"/>
                                     </VBox>
                                     <VBox spacing="4.0">
-                                        <Label text="PAÍS / CÓDIGO POSTAL" styleClass="wizard-field-label"/>
+                                        <Label text="PAÍS / DIRECCION A AVISAR" styleClass="wizard-field-label"/>
                                         <Label fx:id="lblResumenPaisPostal" text="-" styleClass="summary-value"/>
                                     </VBox>
                                 </VBox>

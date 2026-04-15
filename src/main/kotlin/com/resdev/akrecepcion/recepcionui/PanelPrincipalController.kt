@@ -14,6 +14,17 @@ import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.Parent
+import javafx.scene.control.Tooltip
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.javafx.*
+import com.resdev.akrecepcion.recepcionui.db.DbHealthcheck
+import com.resdev.akrecepcion.recepcionui.dao.jdbc.ActividadPacienteDaoJdbc
+import com.resdev.akrecepcion.recepcionui.repository.ActividadRepository
+import com.resdev.akrecepcion.recepcionui.repository.impl.ActividadRepositoryImpl
 
 class PanelPrincipalController {
     var onLogout: (() -> Unit)? = null
@@ -37,6 +48,12 @@ class PanelPrincipalController {
 
     @FXML private lateinit var actividadRowsContainer: VBox
 
+    @FXML private lateinit var systemHealthCard: VBox
+    @FXML private lateinit var lblSystemHealthStatus: Label
+    @FXML private lateinit var lblSystemHealthSync: Label
+
+    private val scope = CoroutineScope(Dispatchers.JavaFx + SupervisorJob())
+
     @FXML
     private fun initialize() {
         val nombre = AppSession.currentUser.nombreCompleto.trim().split(Regex("\\s+")).firstOrNull().orEmpty()
@@ -44,15 +61,72 @@ class PanelPrincipalController {
         lblResumen.text =
             "Tu espacio digital para la atención del paciente. Registra nuevos ingresos y agiliza el flujo de recepción."
 
-        val actividad = FXCollections.observableArrayList(
-            ActividadPacienteRow(nombre = "Elena Rodriguez", pacienteId = "AK-MED-1044-22", tipo = "Recurrente", estado = "Verificado", hora = "09:15"),
-            ActividadPacienteRow(nombre = "Marcus Chen", pacienteId = "AK-MED-3301-07", tipo = "Nuevo", estado = "Procesando", hora = "10:04"),
-            ActividadPacienteRow(nombre = "Sarah Jenkins", pacienteId = null, tipo = "Recurrente", estado = "Verificado", hora = "10:30"),
-        )
-        renderActividadRows(actividad)
+        refreshActividadRows()
 
         // Mark the first nav button as active by default.
         navContainer.children.filterIsInstance<Button>().firstOrNull()?.let { setNavActivo(it) }
+
+        // Salud del sistema: se evalua async para no bloquear UI.
+        updateSystemHealthChecking()
+        scope.launch {
+            val ok = withContext(Dispatchers.IO) { DbHealthcheck.ping().isSuccess }
+            if (ok) updateSystemHealthOnline() else updateSystemHealthOffline()
+        }
+    }
+
+    private val actividadRepo: ActividadRepository = ActividadRepositoryImpl(ActividadPacienteDaoJdbc())
+
+    private fun refreshActividadRows() {
+        // Carga async: si no hay DB o falla, deja la tabla vacía sin romper el dashboard.
+        scope.launch {
+            val rows =
+                withContext(Dispatchers.IO) {
+                    runCatching { actividadRepo.latestActividad(limit = 3) }.getOrDefault(emptyList())
+                }
+
+            renderActividadRows(
+                rows.map {
+                    ActividadPacienteRow(
+                        nombre = it.nombre,
+                        pacienteId = it.codigoUsuario.toString(),
+                        tipo = it.tipo,
+                        estado = it.estado,
+                        hora = it.hora,
+                    )
+                },
+            )
+        }
+    }
+
+    private fun updateSystemHealthChecking() {
+        // Estado intermedio (por si tarda la DB o el pool en inicializar).
+        lblSystemHealthStatus.text = "Verificando conexión..."
+        lblSystemHealthSync.text = "Sincronización en verificación"
+
+        systemHealthCard.styleClass.remove("rose-card")
+        if (!systemHealthCard.styleClass.contains("teal-card")) systemHealthCard.styleClass.add("teal-card")
+
+        Tooltip.install(systemHealthCard, Tooltip("Probando conectividad con MariaDB (SELECT 1)."))
+    }
+
+    private fun updateSystemHealthOnline() {
+        lblSystemHealthStatus.text = "Conexión de Base de datos activa"
+        lblSystemHealthSync.text = "Sincronización segura activa"
+
+        systemHealthCard.styleClass.remove("rose-card")
+        if (!systemHealthCard.styleClass.contains("teal-card")) systemHealthCard.styleClass.add("teal-card")
+
+        Tooltip.install(systemHealthCard, Tooltip("MariaDB conectada. Los cambios se guardarán normalmente."))
+    }
+
+    private fun updateSystemHealthOffline() {
+        lblSystemHealthStatus.text = "Servidor sin conexión"
+        lblSystemHealthSync.text = "Sincronización no segura, no se guardarán cambios"
+
+        systemHealthCard.styleClass.remove("teal-card")
+        if (!systemHealthCard.styleClass.contains("rose-card")) systemHealthCard.styleClass.add("rose-card")
+
+        Tooltip.install(systemHealthCard, Tooltip("No hay conexión con MariaDB. Operación en modo offline (solo visual)."))
     }
 
     private fun renderActividadRows(items: List<ActividadPacienteRow>) {
@@ -169,6 +243,18 @@ class PanelPrincipalController {
         }
     }
 
+    @FXML
+    private fun onIniciarRegistro(@Suppress("UNUSED_PARAMETER") event: ActionEvent) {
+        // Simula la navegación como si el usuario presionara "Nuevo Paciente" en el nav bar:
+        // 1) marca activo
+        // 2) cambia la vista
+        navContainer.children
+            .filterIsInstance<Button>()
+            .firstOrNull { (it.userData as? String)?.trim() == "nuevo-paciente" }
+            ?.let { setNavActivo(it) }
+        showNuevoPaciente()
+    }
+
     private fun setNavActivo(activo: Button) {
         navContainer.children.filterIsInstance<Button>().forEach { it.styleClass.remove("nav-button-active") }
         if (!activo.styleClass.contains("nav-button-active")) activo.styleClass.add("nav-button-active")
@@ -192,6 +278,9 @@ class PanelPrincipalController {
         navViewHost.isManaged = false
         dashboardView.isVisible = true
         dashboardView.isManaged = true
+
+        // Al volver al dashboard, refresca “Actividad de hoy”.
+        refreshActividadRows()
     }
 
     private fun showNuevoPaciente() {
@@ -218,6 +307,9 @@ class PanelPrincipalController {
                 showPacienteRecurrenteEdit(pacienteId)
             }
         }
+
+        // Cada vez que entramos a la vista, recarga los últimos 3.
+        pacienteRecurrenteController?.onViewShown()
 
         dashboardView.isVisible = false
         dashboardView.isManaged = false
@@ -269,6 +361,15 @@ class PanelPrincipalController {
             ?.let { setNavActivo(it) }
         showPacienteRecurrente()
         pacienteRecurrenteController?.openPaciente(pacienteId = r.pacienteId, nombre = r.nombre)
+    }
+
+    @FXML
+    private fun onRecuperarPerfil(@Suppress("UNUSED_PARAMETER") event: ActionEvent) {
+        navContainer.children
+            .filterIsInstance<Button>()
+            .firstOrNull { (it.userData as? String)?.trim() == "paciente-recurrente" }
+            ?.let { setNavActivo(it) }
+        showPacienteRecurrente()
     }
 
     private fun showBusquedaPacientes() {

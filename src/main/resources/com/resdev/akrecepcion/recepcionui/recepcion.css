@@ -235,6 +235,11 @@
   -fx-border-color: transparent;
 }
 
+.rose-card {
+  -fx-background-color: linear-gradient(to bottom right, #b42318, #7f1d1d);
+  -fx-border-color: transparent;
+}
+
 .inverted {
   -fx-text-fill: rgba(255, 255, 255, 0.92);
 }
@@ -1059,6 +1064,15 @@
   -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.05), 14, 0.18, 0, 8);
 }
 
+.ps-table-pp-activity-table{
+  -fx-background-color: white;
+  -fx-background-radius: 18;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 18;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.05), 14, 0.18, 0, 8);
+  -fx-padding: 10 14;
+
+}
 .ps-table-header {
   -fx-padding: 12 16;
   -fx-background-color: #f8fafc;
