@@ -28,6 +28,8 @@
   -fx-alignment: CENTER_LEFT;
   -fx-font-size: 12px;
   -fx-background-radius: 10;
+  -fx-graphic-text-gap: 10;
+  -fx-content-display: LEFT;
 }
 .nav-button:hover {
   -fx-background-color: #f0f4ff;
@@ -167,6 +169,67 @@
   -fx-text-fill: #0f172a;
 }
 
+.pp-hero-cards {
+  -fx-padding: 22 0 42 0;
+}
+
+.pp-action-card {
+  -fx-background-color: white;
+  -fx-background-radius: 16;
+  -fx-border-color: #eef2f7;
+  -fx-border-radius: 16;
+  -fx-padding: 42 52 34 52;
+  -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.06), 14, 0.18, 0, 4);
+}
+
+.pp-card-icon-badge,
+.pp-card-icon-badge-soft {
+  -fx-min-width: 58;
+  -fx-min-height: 58;
+  -fx-max-width: 58;
+  -fx-max-height: 58;
+  -fx-background-radius: 12;
+  -fx-effect: dropshadow(gaussian, rgba(11, 114, 133, 0.22), 18, 0.22, 0, 10);
+}
+
+.pp-card-icon-badge {
+  -fx-background-color: #087ea4;
+}
+
+.pp-card-icon-badge-soft {
+  -fx-background-color: #cdebf7;
+}
+
+.pp-card-icon-fallback,
+.pp-card-icon-fallback-soft {
+  -fx-font-size: 28px;
+  -fx-font-weight: 900;
+}
+
+.pp-card-icon-fallback {
+  -fx-text-fill: white;
+}
+
+.pp-card-icon-fallback-soft {
+  -fx-text-fill: #3d6476;
+}
+
+.pp-card-svg-icon {
+  -fx-fill: white;
+}
+
+.pp-card-title {
+  -fx-font-size: 25px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #0b0f14;
+}
+
+.pp-card-description {
+  -fx-text-fill: #243140;
+  -fx-font-size: 16px;
+  -fx-line-spacing: 5px;
+}
+
 .link-button {
   -fx-background-color: transparent;
   -fx-text-fill: #0b7285;
@@ -178,22 +241,29 @@
 }
 
 .stat {
-  -fx-background-color: white;
+  -fx-background-color: #f1f3f6;
   -fx-background-radius: 14;
-  -fx-border-color: #eef2f7;
+  -fx-border-color: transparent;
   -fx-border-radius: 14;
-  -fx-padding: 12 14;
-  -fx-pref-width: 160;
+  -fx-padding: 26 14 24 14;
+  -fx-pref-width: 200;
+  -fx-alignment: CENTER;
 }
 .stat-value {
-  -fx-font-size: 20px;
+  -fx-font-size: 34px;
   -fx-font-weight: 800;
   -fx-text-fill: #0f172a;
 }
+.stat-value-tone-primary {
+  -fx-text-fill: #00618a;
+}
+.stat-value-tone-ok {
+  -fx-text-fill: #007a2f;
+}
 .stat-label {
-  -fx-font-size: 10px;
-  -fx-text-fill: #64748b;
-  -fx-font-weight: 700;
+  -fx-font-size: 12px;
+  -fx-text-fill: #1f2a37;
+  -fx-font-weight: 900;
   -fx-letter-spacing: 0.6px;
 }
 
@@ -1070,7 +1140,7 @@
   -fx-border-color: #eef2f7;
   -fx-border-radius: 18;
   -fx-effect: dropshadow(gaussian, rgba(2, 6, 23, 0.05), 14, 0.18, 0, 8);
-  -fx-padding: 10 14;
+  -fx-padding: 0;
 
 }
 .ps-table-header {
@@ -1086,6 +1156,9 @@
   -fx-letter-spacing: 0.8px;
   -fx-padding: 0 10 0 0;
 }
+.ps-th-right {
+  -fx-alignment: CENTER_RIGHT;
+}
 
 .ps-table-sep {
   -fx-opacity: 0.55;
@@ -1096,13 +1169,15 @@
 }
 
 .pp-activity-table .ps-table-header {
-  -fx-padding: 10 14;
+  -fx-padding: 20 30;
+  -fx-background-color: #f1f3f6;
+  -fx-background-radius: 18 18 0 0;
 }
 .pp-activity-table .ps-th {
   -fx-padding: 0 8 0 0;
 }
 .pp-activity-table .ps-row {
-  -fx-padding: 10 14;
+  -fx-padding: 18 30;
 }
 
 .ps-row {

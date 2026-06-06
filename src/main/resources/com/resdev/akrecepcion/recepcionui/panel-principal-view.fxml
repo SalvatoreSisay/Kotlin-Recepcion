@@ -3,9 +3,10 @@
 <?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane styleClass="app-root" stylesheets="@recepcion.css" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.12" fx:controller="com.resdev.akrecepcion.recepcionui.PanelPrincipalController">
+<BorderPane styleClass="app-root" stylesheets="@recepcion.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.resdev.akrecepcion.recepcionui.PanelPrincipalController">
 
     <left>
         <VBox spacing="14.0" styleClass="sidebar">
@@ -13,20 +14,62 @@
                 <Insets bottom="18.0" left="14.0" right="14.0" top="18.0" />
             </padding>
 
-            <VBox spacing="4.0">
-                <Label styleClass="brand-title" text="Centro Médico" />
-                <Label styleClass="brand-subtitle" text="Portal de recepción" />
-            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <ImageView fitHeight="32.0" fitWidth="32.0" preserveRatio="true" pickOnBounds="true">
+                    <Image url="@icons/medical-center.png" />
+                </ImageView>
+
+                <VBox spacing="4.0">
+                    <Label styleClass="brand-title" text="Centro Médico" />
+                    <Label styleClass="brand-subtitle" text="Portal de recepción" />
+                </VBox>
+            </HBox>
 
             <Separator />
 
             <VBox fx:id="navContainer" spacing="6.0">
-                <Button onAction="#onNavClick" styleClass="nav-button" text="Menu Principal" userData="dashboard" />
-                <Button onAction="#onNavClick" styleClass="nav-button" text="Nuevo Paciente" userData="nuevo-paciente" />
-                <Button onAction="#onNavClick" styleClass="nav-button" text="Pacientes" userData="paciente-recurrente" />
-                <Button onAction="#onNavClick" styleClass="nav-button" text="Búsqueda de Pacientes" userData="busqueda-pacientes" />
-                <Button onAction="#onNavClick" styleClass="nav-button" text="Agendar" userData="agendar" />
-                <Button onAction="#onNavClick" styleClass="nav-button" text="Reportes" userData="reportes" />
+                <Button onAction="#onNavClick" styleClass="nav-button" text="Menu Principal" userData="dashboard">
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                    <Image url="@icons/nav-dashboard.png" />
+                            </ImageView>
+                        </graphic>
+                </Button>
+                <Button onAction="#onNavClick" styleClass="nav-button" text="Nuevo Paciente" userData="nuevo-paciente">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                    <Image url="@icons/nav-nuevo-paciente.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
+                <Button onAction="#onNavClick" styleClass="nav-button" text="Pacientes" userData="paciente-recurrente">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                    <Image url="@icons/nav-pacientes.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
+                <Button onAction="#onNavClick" styleClass="nav-button" text="Búsqueda de Pacientes" userData="búsqueda-pacientes">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                    <Image url="@icons/nav-busqueda.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
+                <Button onAction="#onNavClick" styleClass="nav-button" text="Agendar" userData="agendar">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                    <Image url="@icons/nav-agendar.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
+                <Button onAction="#onNavClick" styleClass="nav-button" text="Reportes" userData="reportes">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                        <Image url="@icons/nav-reportes.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
             </VBox>
 
             <Region VBox.vgrow="ALWAYS" />
@@ -36,8 +79,20 @@
             <Separator />
 
             <VBox spacing="6.0">
-                <Button onAction="#onNavClick" styleClass="nav-button-tone-secondary" text="Configuración" userData="configuracion" />
-                <Button onAction="#onNavClick" styleClass="nav-button-tone-secondary" text="Ayuda" userData="ayuda" />
+                <Button onAction="#onNavClick" styleClass="nav-button-tone-secondary" text="Configuración" userData="configuración">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                        <Image url="@icons/nav-configuracion.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
+                <Button onAction="#onNavClick" styleClass="nav-button-tone-secondary" text="Ayuda" userData="ayuda">
+                        <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" preserveRatio="true" pickOnBounds="true">
+                                        <Image url="@icons/nav-ayuda.png" />
+                                </ImageView>
+                        </graphic>
+                </Button>
             </VBox>
         </VBox>
     </left>
@@ -75,20 +130,64 @@
                     <Label fx:id="lblResumen" styleClass="muted" text="Resumen" />
                 </VBox>
 
-                <HBox spacing="14.0">
-                    <VBox spacing="8.0" styleClass="card">
-                        <Label styleClass="card-title" text="Nuevo paciente" />
-                        <Label styleClass="muted" text="Inicia un registro para un nuevo ingreso. Captura datos y crea el expediente." wrapText="true" />
-                        <Button onAction="#onIniciarRegistro" styleClass="link-button" text="Iniciar registro" />
+                <HBox spacing="28.0" styleClass="pp-hero-cards">
+                    <VBox maxWidth="1.7976931348623157E308" minHeight="246.0" spacing="18.0" styleClass="pp-action-card" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT">
+                            <StackPane>
+                                <!-- PNG: agrega <image><Image url="@icons/nuevo-paciente.png" /></image> dentro de este ImageView. -->
+                                <!-- SVG: reemplaza este ImageView por un SVGPath con styleClass="pp-card-svg-icon". -->
+                                <ImageView fitHeight="103.0" fitWidth="95.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@icons/nuevo-paciente.png"/>
+                                </ImageView>
+                            </StackPane>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <!-- Arte grande opcional de la tarjeta. Carga aquí un PNG/SVG convertido a PNG si lo necesitas. -->
+                            <ImageView fitHeight="96.0" fitWidth="128.0" opacity="0.5" preserveRatio="true">
+                                <Image url="@icons/big-nuevo-paciente.png"/>
+                            </ImageView>
+                        </HBox>
+                        <VBox spacing="10.0">
+                            <Label styleClass="pp-card-title" text="Nuevo paciente" />
+                            <Label styleClass="pp-card-description" text="Inicia un registro para un nuevo ingreso. Captura datos y crea el expediente." wrapText="true" />
+                            <Button onAction="#onIniciarRegistro" styleClass="link-button" text="Iniciar registro " contentDisplay="RIGHT">
+                                <graphic>
+                                    <ImageView fitHeight="10.0" fitWidth="10.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@icons/next.png"/>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </VBox>
                     </VBox>
-                    <VBox spacing="8.0" styleClass="card">
-                        <Label styleClass="card-title" text="Paciente recurrente" />
-                        <Label styleClass="muted" text="Búsqueda rápida para pacientes existentes y actualización del motivo de visita." wrapText="true" />
-                        <Button onAction="#onRecuperarPerfil" styleClass="link-button" text="Recuperar perfil" />
+                    <VBox maxWidth="1.7976931348623157E308" minHeight="246.0" spacing="18.0" styleClass="pp-action-card" HBox.hgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT">
+                            <StackPane>
+                                <!-- PNG: agrega <image><Image url="@icons/paciente-recurrente.png" /></image> dentro de este ImageView. -->
+                                <!-- SVG: reemplaza este ImageView por un SVGPath con styleClass="pp-card-svg-icon". -->
+                                <ImageView fitHeight="103.0" fitWidth="95.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@icons/paciente-recurrente.png"/>
+                                </ImageView>
+                            </StackPane>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <!-- Arte grande opcional de la tarjeta. Carga aquí un PNG/SVG convertido a PNG si lo necesitas. -->
+                            <ImageView fitHeight="96.0" fitWidth="128.0" opacity="0.5" preserveRatio="true">
+                                    <Image url="@icons/big-paciente-recurrente.png"/>
+                            </ImageView>
+                        </HBox>
+                        <VBox spacing="10.0">
+                            <Label styleClass="pp-card-title" text="Paciente recurrente" />
+                            <Label styleClass="pp-card-description" text="Búsqueda rápida para pacientes existentes y actualización del motivo de visita." wrapText="true" />
+                            <Button onAction="#onRecuperarPerfil" styleClass="link-button" text="Recuperar perfil " contentDisplay="RIGHT">
+                                <graphic>
+                                    <ImageView fitHeight="10.0" fitWidth="10.0" pickOnBounds="true" preserveRatio="true" >
+                                        <Image url="@icons/reloj.png"/>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </VBox>
                     </VBox>
                 </HBox>
 
-                        <HBox spacing="14.0">
+                <HBox spacing="28.0">
                     <VBox spacing="10.0" HBox.hgrow="ALWAYS">
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <Label styleClass="section-title" text="Actividad de hoy" />
@@ -97,27 +196,51 @@
                         </HBox>
 
                         <HBox spacing="10.0">
-                            <VBox spacing="3.0" styleClass="stat">
-                                <Label styleClass="stat-value" text="24" />
+                            <VBox maxWidth="1.7976931348623157E308" spacing="3.0" styleClass="stat" HBox.hgrow="ALWAYS">
+                                <Label text="24">
+                                    <styleClass>
+                                        <String fx:value="stat-value" />
+                                        <String fx:value="stat-value-tone-primary" />
+                                    </styleClass>
+                                </Label>
                                 <Label styleClass="stat-label" text="COMPLETADOS" />
                             </VBox>
-                            <VBox spacing="3.0" styleClass="stat">
-                                <Label styleClass="stat-value" text="8" />
+                            <VBox maxWidth="1.7976931348623157E308" spacing="3.0" styleClass="stat" HBox.hgrow="ALWAYS">
+                                <Label text="08">
+                                    <styleClass>
+                                        <String fx:value="stat-value" />
+                                        <String fx:value="stat-value-tone-ok" />
+                                    </styleClass>
+                                </Label>
                                 <Label styleClass="stat-label" text="EN PROGRESO" />
                             </VBox>
-                            <VBox spacing="3.0" styleClass="stat">
+                            <VBox maxWidth="1.7976931348623157E308" spacing="3.0" styleClass="stat" HBox.hgrow="ALWAYS">
                                 <Label styleClass="stat-value" text="12" />
                                 <Label styleClass="stat-label" text="PROGRAMADOS" />
                             </VBox>
                         </HBox>
 
-                        <VBox styleClass="ps-table-pp-activity-table">
+                        <VBox>
+                            <styleClass>
+                                <String fx:value="ps-table-pp-activity-table" />
+                                <String fx:value="pp-activity-table" />
+                            </styleClass>
                             <HBox styleClass="ps-table-header">
-                                <Label styleClass="ps-th" text="PACIENTE" HBox.hgrow="ALWAYS" />
-                                <Label prefWidth="130.0" styleClass="ps-th" text="TIPO" />
-                                <Label prefWidth="130.0" styleClass="ps-th" text="ESTADO" />
-                                <Label prefWidth="90.0" styleClass="ps-th" text="HORA" />
-                                <Label prefWidth="120.0" styleClass="ps-th" text="ACCIONES" />
+                                <Label maxWidth="1.7976931348623157E308" styleClass="ps-th" text="PACIENTE" HBox.hgrow="ALWAYS" />
+                                <Label maxWidth="130.0" minWidth="130.0" prefWidth="130.0" styleClass="ps-th" text="TIPO" />
+                                <Label maxWidth="130.0" minWidth="130.0" prefWidth="130.0" styleClass="ps-th" text="ESTADO" />
+                                <Label maxWidth="90.0" minWidth="90.0" prefWidth="90.0" text="HORA">
+                                    <styleClass>
+                                        <String fx:value="ps-th" />
+                                        <String fx:value="ps-th-right" />
+                                    </styleClass>
+                                </Label>
+                                <Label maxWidth="120.0" minWidth="120.0" prefWidth="120.0" text="ACCIONES">
+                                    <styleClass>
+                                        <String fx:value="ps-th" />
+                                        <String fx:value="ps-th-right" />
+                                    </styleClass>
+                                </Label>
                             </HBox>
 
                             <Separator styleClass="ps-table-sep" />

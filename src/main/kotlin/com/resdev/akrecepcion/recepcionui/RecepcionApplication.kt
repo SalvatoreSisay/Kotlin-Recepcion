@@ -18,7 +18,7 @@ class RecepcionApplication : Application() {
     }
 
     override fun start(stage: Stage) {
-        // Paso 3: carga opcional de ".env" para desarrollo local (no es requerido en prod).
+        // Paso 3: carga opcional de".env" para desarrollo local (no es requerido en prod).
         Env.preload()
 
         val scene = Scene(loadLogin(stage), 1200.0, 760.0)

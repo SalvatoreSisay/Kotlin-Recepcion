@@ -42,8 +42,10 @@
             <Insets bottom="20.0" left="26.0" right="26.0" top="26.0" />
         </padding>
 
-        <StackPane styleClass="card-icon">
-            <Label alignment="CENTER" styleClass="card-icon-text" text="ID" />
+        <StackPane>
+            <ImageView fitHeight="54.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@icons/login/login-principal.png"/>
+            </ImageView>
         </StackPane>
 
         <VBox alignment="CENTER" spacing="6.0">
@@ -55,9 +57,11 @@
             <Label styleClass="field-label" text="ID DE EMPLEADO / USUARIO" />
             <HBox fx:id="usuarioWrap" spacing="10.0" styleClass="field-wrap">
                 <StackPane styleClass="field-icon">
-                    <Label styleClass="field-icon-text" text="ID" />
+                    <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@icons/login/carne-login.png"/>
+                    </ImageView>
                 </StackPane>
-                <TextField fx:id="txtUsuario" promptText="ej. CS-98421" styleClass="field" />
+                <TextField fx:id="txtUsuario" promptText="ID de empleado / usuario" styleClass="field" />
             </HBox>
         </VBox>
 
@@ -65,13 +69,21 @@
             <Label styleClass="field-label" text="CONTRASEÑA" />
             <HBox fx:id="contrasenaWrap" spacing="10.0" styleClass="field-wrap">
                 <StackPane styleClass="field-icon">
-                    <Label styleClass="field-icon-text" text="*" />
+                    <ImageView fitHeight="14.0" fitWidth="14.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@icons/login/candado-login.png"/>
+                    </ImageView>
                 </StackPane>
                 <StackPane HBox.hgrow="ALWAYS">
                     <PasswordField fx:id="txtContrasena" promptText="••••••••" styleClass="field" />
                     <TextField fx:id="txtContrasenaVisible" promptText="••••••••" styleClass="field" />
                 </StackPane>
-                <Button onAction="#onTogglePassword" styleClass="field-eye" text="Ver" />
+                <Button onAction="#onTogglePassword" styleClass="field-eye">
+                        <graphic>
+                                <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true">
+                                        <Image url="@icons/login/ver-login.png"/>
+                                </ImageView>
+                        </graphic>
+                </Button>
             </HBox>
         </VBox>
 
@@ -82,7 +94,13 @@
         </HBox>
 
         <StackPane>
-            <Button onAction="#onLoginClick" styleClass="primary" text="Ingresar al portal  →" />
+            <Button onAction="#onLoginClick" styleClass="primary" text="Ingresar al portal " contentDisplay="RIGHT">
+                    <graphic>
+                            <ImageView fitHeight="12.0" fitWidth="12.0" pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@icons/login/next-login.png"/>
+                            </ImageView>
+                    </graphic>
+            </Button>
         </StackPane>
 
         <StackPane>

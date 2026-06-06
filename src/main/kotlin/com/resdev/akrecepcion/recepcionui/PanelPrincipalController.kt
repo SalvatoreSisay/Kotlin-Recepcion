@@ -29,6 +29,13 @@ import com.resdev.akrecepcion.recepcionui.repository.impl.ActividadRepositoryImp
 class PanelPrincipalController {
     var onLogout: (() -> Unit)? = null
 
+    private companion object {
+        const val COL_TIPO_WIDTH = 130.0
+        const val COL_ESTADO_WIDTH = 130.0
+        const val COL_HORA_WIDTH = 90.0
+        const val COL_ACCIONES_WIDTH = 120.0
+    }
+
     data class ActividadPacienteRow(
         val nombre: String,
         val pacienteId: String? = null,
@@ -134,40 +141,20 @@ class PanelPrincipalController {
     }
 
     private fun createActividadRow(r: ActividadPacienteRow): Node {
-        val initials =
-            r.nombre
-                .trim()
-                .split(Regex("\\s+"))
-                .filter { it.isNotBlank() }
-                .take(2)
-                .map { it.first().uppercaseChar() }
-                .joinToString("")
-                .ifBlank { "P" }
-
-        val avatar = StackPane(Label(initials).apply { styleClass.add("ps-avatar-text") }).apply {
-            styleClass.add("ps-avatar")
-            minWidth = 36.0
-            minHeight = 36.0
-            maxWidth = 36.0
-            maxHeight = 36.0
-        }
-
         val patientMeta = r.pacienteId?.takeIf { it.isNotBlank() }?.let { "ID: $it" } ?: " "
-        val patientBlock = HBox(12.0).apply {
+        val patientBlock = VBox(2.0).apply {
             children.addAll(
-                avatar,
-                VBox(2.0).apply {
-                    children.addAll(
-                        Label(r.nombre).apply { styleClass.add("ps-patient-name") },
-                        Label(patientMeta).apply { styleClass.add("muted") },
-                    )
-                },
+                Label(r.nombre).apply { styleClass.add("ps-patient-name") },
+                Label(patientMeta).apply { styleClass.add("muted") },
             )
+            maxWidth = Double.MAX_VALUE
             HBox.setHgrow(this, Priority.ALWAYS)
         }
 
         val tipoCell = VBox(2.0).apply {
-            prefWidth = 130.0
+            minWidth = COL_TIPO_WIDTH
+            prefWidth = COL_TIPO_WIDTH
+            maxWidth = COL_TIPO_WIDTH
             children.addAll(
                 Label(r.tipo).apply { styleClass.add("ps-cell-strong") },
                 Region().apply { minHeight = 1.0 },
@@ -176,20 +163,31 @@ class PanelPrincipalController {
 
         val statusChip = Label(r.estado).apply { styleClass.addAll("ps-status-chip", estadoToneClass(r.estado)) }
         val estadoCell = HBox(statusChip).apply {
-            prefWidth = 130.0
+            minWidth = COL_ESTADO_WIDTH
+            prefWidth = COL_ESTADO_WIDTH
+            maxWidth = COL_ESTADO_WIDTH
             alignmentProperty().set(javafx.geometry.Pos.CENTER_LEFT)
         }
 
         val horaCell = VBox(2.0).apply {
-            prefWidth = 90.0
+            minWidth = COL_HORA_WIDTH
+            prefWidth = COL_HORA_WIDTH
+            maxWidth = COL_HORA_WIDTH
+            alignmentProperty().set(javafx.geometry.Pos.CENTER_RIGHT)
             children.addAll(
-                Label(r.hora).apply { styleClass.add("ps-cell-strong") },
+                Label(r.hora).apply {
+                    styleClass.add("ps-cell-strong")
+                    maxWidth = Double.MAX_VALUE
+                    alignmentProperty().set(javafx.geometry.Pos.CENTER_RIGHT)
+                },
                 Region().apply { minHeight = 1.0 },
             )
         }
 
         val actions = HBox(8.0).apply {
-            prefWidth = 120.0
+            minWidth = COL_ACCIONES_WIDTH
+            prefWidth = COL_ACCIONES_WIDTH
+            maxWidth = COL_ACCIONES_WIDTH
             alignmentProperty().set(javafx.geometry.Pos.CENTER_RIGHT)
             children.add(
                 Button("Ver").apply {
